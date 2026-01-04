@@ -9,6 +9,7 @@
   home.homeDirectory = "/home/ksgm";
   home.stateVersion = "25.11";
 
+
   # User packages
   home.packages = with pkgs; [
     git
@@ -18,15 +19,9 @@
     fish
     alacritty
     nerd-fonts.fantasque-sans-mono
+    kdePackages.dolphin
+    kdePackages.dolphin-plugins
   ];
-
-  programs.git = {
-    enable = true;
-    settings = {
-      user.name = "Kassio Guimaraes";
-      user.email = "kassio@tuta.com";
-    };
-  };
 
   programs.bash = {
     enable = true;
@@ -37,6 +32,11 @@
         exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
       fi
     '';
+  };
+
+  services = {
+    copyq.enable = true;
+    flameshot.enable = true;
   };
 
   programs.home-manager.enable = true;

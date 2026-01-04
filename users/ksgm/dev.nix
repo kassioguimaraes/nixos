@@ -2,7 +2,7 @@
 
 {
   home.packages = with pkgs; [
-    vscode 
+    vscode
     tmux
     tmux-sessionizer
     nodejs_24
@@ -19,4 +19,19 @@
     laravel
     ripgrep
   ];
+
+  programs.git = {
+    enable = true;
+    settings = {
+      user.name = "Kassio Guimaraes";
+      user.email = "kassio@tuta.com";
+    };
+  };
+
+  programs.nixvim = {
+    enable = true;
+    imports = [ ./nixvim/default.nix ];
+    nixpkgs = { config = { allowUnfree = true; }; };
+  };
+
 }
