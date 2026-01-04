@@ -3,6 +3,7 @@
 {
   imports = [
     ./hyprland.nix
+    ./dev.nix
   ];
   home.username = "ksgm";
   home.homeDirectory = "/home/ksgm";
@@ -16,6 +17,7 @@
     wget
     fish
     alacritty
+    nerd-fonts.fantasque-sans-mono
   ];
 
   programs.git = {

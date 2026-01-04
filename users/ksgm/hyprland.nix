@@ -1,17 +1,21 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./waybar.nix
+  ];
   wayland.windowManager.hyprland = {
     enable = true;
 
     settings = {
+      monitor = "eDP-1, 1920x1080@60,0x0, 1.25";
       general = {
         "layout" = "master";
       };
       "$mod" = "SUPER";
       "$alt" = "ALT_L";
       "$terminal" = "alacritty";
-      "$menu" = "rofi, -show, drun";
+      "$menu" = "rofi -show drun";
 
       input = {
         "kb_model" = "pc104";
