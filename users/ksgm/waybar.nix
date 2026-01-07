@@ -48,6 +48,7 @@
       };
 
       cpu = {
+        "on-click" = "alacritty --class tuiterm --command btop";
         format = "{usage}% ";
         tooltip = true;
         "tooltip-format" = ''
@@ -56,6 +57,7 @@
       };
 
       memory = {
+        "on-click" = "alacritty --class tuiterm --command btop";
         format = "{}% 󰍛";
         tooltip = true;
         "tooltip-format" = "RAM usage: {used} / {total} ({percentage}%)";
@@ -121,7 +123,7 @@
       };
 
       network = {
-        "on-click" = "alacritty --command impala";
+        "on-click" = "alacritty --class tuiterm --command impala";
         format = " {essid} - {signalStrength}";
         "format-ethernet" = "{ifname} 󰈀";
         "format-disconnected" = " ";

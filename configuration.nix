@@ -14,11 +14,20 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.plymouth.enable = true;
-  boot.kernelParams = [ "quiet" "splash" ];
+
+  security.pam.services.hyprlock = {};
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
+
+
+  boot.kernelParams = [ "quiet" ];
 
   boot.initrd.luks.devices."luks-8b1f2dc2-3daf-497c-9e94-737157c54d85".device = "/dev/disk/by-uuid/8b1f2dc2-3daf-497c-9e94-737157c54d85";
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  #power
+  services.tlp.enable = true;
 
   # Docker
   virtualisation.docker.enable = true;
@@ -103,7 +112,6 @@
 
   # Install firefox.
   programs.firefox.enable = true;
-  programs.hyprland.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
