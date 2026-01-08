@@ -128,8 +128,13 @@ security.pam.services.hyprlock = {};
 
   #stylix
   stylix.enable = true;
-  stylix.image = ''/home/ksgm/nixos/users/ksgm/assets/wallpapers/wall.jpg'';
-  stylix.polarity = "light";
+  stylix.image = ./users/ksgm/assets/wallpapers/alt.png;
+  stylix.polarity = "dark";
+  stylix.opacity = {
+    terminal = 0.8;
+    popups = 0.8;
+    desktop = 0.85;
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

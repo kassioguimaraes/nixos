@@ -27,14 +27,14 @@
           ];
         };
       };
-      ui = { fontDefault = "FantasqueSansMono Nerd Font"; };
+      #ui = { fontDefault = "FantasqueSansMono Nerd Font"; };
       location = { name = "Macapá"; };
 
-      wallpaper = { enabled = true; };
-      colorSchemes = {
-        useWallpaperColors = true;
-        darkMode = false;
-      };
+      #wallpaper = { enabled = true; };
+      #colorSchemes = {
+      #  useWallpaperColors = true;
+      #  darkMode = false;
+      #};
       #templates = {
       #  gtk = true;
       #  qt = true;
@@ -46,9 +46,9 @@
       #};
     };
   };
-  home.file.".cache/noctalia/wallpapers.json" = {
-    text = builtins.toJSON {
-      defaultWallpaper = "/home/ksgm/nixos/users/ksgm/assets/wallpapers/wall.jpg";
-    };
-  };
+  #home.file.".cache/noctalia/wallpapers.json" = {
+  #  text = builtins.toJSON {
+  #    defaultWallpaper = "/home/ksgm/nixos/users/ksgm/assets/wallpapers/wall.jpg";
+  #  };
+  #};
 }
