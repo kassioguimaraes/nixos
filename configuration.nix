@@ -15,19 +15,21 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.plymouth.enable = true;
 
-  security.pam.services.hyprlock = {};
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
+security.pam.services.hyprlock = {};
+#environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  programs.hyprland.enable = true;
+  #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
 
 
-  boot.kernelParams = [ "quiet" ];
+  boot.kernelParams = [ "quiet" "splash" ];
 
   boot.initrd.luks.devices."luks-8b1f2dc2-3daf-497c-9e94-737157c54d85".device = "/dev/disk/by-uuid/8b1f2dc2-3daf-497c-9e94-737157c54d85";
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   #power
-  services.tlp.enable = true;
+  services.power-profiles-daemon.enable = true;
+  services.upower.enable = true;
 
   # Docker
   virtualisation.docker.enable = true;
@@ -43,6 +45,7 @@
   networking.networkmanager.enable = true;
   networking.wireless.iwd.enable = true;
   networking.networkmanager.wifi.backend = "iwd";
+  hardware.bluetooth.enable = true;
 
   # Set your time zone.
   time.timeZone = "America/Belem";

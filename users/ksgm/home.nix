@@ -1,15 +1,10 @@
 { config, pkgs, ... }:
 
 {
-  imports = [
-    ./hyprland.nix
-    ./dev.nix
-    ./looks.nix
-  ];
+  imports = [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ];
   home.username = "ksgm";
   home.homeDirectory = "/home/ksgm";
   home.stateVersion = "25.11";
-
 
   # User packages
   home.packages = with pkgs; [
@@ -18,7 +13,6 @@
     curl
     wget
     fish
-    alacritty
     nerd-fonts.fantasque-sans-mono
     xfce.thunar
     xfce.thunar-archive-plugin
@@ -74,7 +68,21 @@
         theme[process_start]="#286983"
         theme[process_mid]="#56949f"
         theme[process_end]="#56949f"
-        '';
+      '';
+    };
+  };
+  programs.kitty = {
+    enable = true;
+    font = {
+      package = pkgs.nerd-fonts.fantasque-sans-mono;
+      name = "FantasqueSansMono Nerd Font";
+      size = 12;
+    };
+    extraConfig = ''
+      include /home/ksgm/.config/kitty/themes/noctalia.conf
+      '';
+    settings = {
+      window_padding_width = "1 4";
     };
   };
   programs.bash = {
@@ -94,6 +102,5 @@
   };
 
   programs.home-manager.enable = true;
-
 
 }

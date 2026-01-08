@@ -12,9 +12,13 @@
     nixvim = {
       url = "github:nix-community/nixvim";
     };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager,nixvim, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager,nixvim, ... }:
   let
     system = "x86_64-linux";
   in {
@@ -28,7 +32,7 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.sharedModules = [ nixvim.homeModules.nixvim ];
+          home-manager.sharedModules = [ nixvim.homeModules.nixvim inputs.noctalia.homeModules.default ];
 
           home-manager.users.ksgm =
             import ./users/ksgm/home.nix;

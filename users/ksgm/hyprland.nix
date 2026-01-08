@@ -1,16 +1,40 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./waybar.nix ];
+  #imports = [ ./waybar.nix ];
   wayland.windowManager.hyprland = {
     enable = true;
 
     settings = {
       monitor = "eDP-1, 1920x1080@60,0x0, 1.25";
-      general = { "layout" = "master"; };
+      general = {
+        layout = "master";
+        gaps_in = 5;
+        gaps_out = 10;
+      };
+
+      decoration = {
+        rounding = 20;
+        rounding_power = 2;
+        shadow = {
+          enabled = true;
+          range = 4;
+          render_power = 3;
+          color = "rgba(1a1a1aee)";
+
+        };
+
+        blur = {
+          enabled = true;
+          size = 3;
+          passes = 1;
+          vibrancy = 0.1696;
+        };
+      };
+
       "$mod" = "SUPER";
       "$alt" = "ALT_L";
-      "$terminal" = "alacritty";
+      "$terminal" = "kitty";
       "$menu" = "rofi -show drun";
 
       input = {
@@ -22,7 +46,7 @@
       master = { "mfact" = 0.55; };
 
       bind = [
-        "$mod, RETURN, exec, alacritty"
+        "$mod, RETURN, exec, kitty"
         "$mod SHIFT, C, killactive"
         "$mod, F, togglefloating"
         "$alt, Q, exec,$menu"
@@ -58,7 +82,8 @@
         ", XF86AudioPlay, exec, playerctl play-pause"
         ", XF86AudioPrev, exec, playerctl previous"
       ];
-      windowrule = "float, center, size 70% 70%, pin, opacity 0.92, class:tuiterm";
+      windowrule =
+        "float, center, size 70% 70%, pin, opacity 0.92, class:tuiterm";
     };
   };
 
