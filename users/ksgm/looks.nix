@@ -30,6 +30,9 @@
       size = 12;
     };
   };
+  home.packages = with pkgs; [
+    pywalfox-native
+  ];
 
   home.sessionVariables = { QT_QPA_PLATFORMTHEME = "gtk3"; };
 }

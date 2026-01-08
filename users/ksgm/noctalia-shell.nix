@@ -35,15 +35,15 @@
         useWallpaperColors = true;
         darkMode = false;
       };
-      templates = {
-        gtk = true;
-        qt = true;
-        kcolorscheme = true;
-        kitty = true;
-        discord = true;
-        pywalfox = true;
-        yazi = true;
-      };
+      #templates = {
+      #  gtk = true;
+      #  qt = true;
+      #  kcolorscheme = true;
+      #  kitty = true;
+      #  discord = true;
+      #  pywalfox = true;
+      #  yazi = true;
+      #};
     };
   };
   home.file.".cache/noctalia/wallpapers.json" = {

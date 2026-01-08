@@ -1,1 +1,1 @@
-{ colorschemes = { rose-pine.enable = true; }; }
+{ colorschemes = { default = true; }; }

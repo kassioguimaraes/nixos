@@ -78,9 +78,9 @@
       name = "FantasqueSansMono Nerd Font";
       size = 12;
     };
-    extraConfig = ''
-      include /home/ksgm/.config/kitty/themes/noctalia.conf
-      '';
+    #extraConfig = ''
+    #  include /home/ksgm/.config/kitty/themes/noctalia.conf
+    #  '';
     settings = {
       window_padding_width = "1 4";
     };

@@ -126,6 +126,11 @@ security.pam.services.hyprlock = {};
   #  wget
   ];
 
+  #stylix
+  stylix.enable = true;
+  stylix.image = "/home/ksgm/nixos/users/ksgm/assets/wallpapers/wall.jpg";
+  stylix.polarity = "light";
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
