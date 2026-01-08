@@ -128,7 +128,7 @@ security.pam.services.hyprlock = {};
 
   #stylix
   stylix.enable = true;
-  stylix.image = "/home/ksgm/nixos/users/ksgm/assets/wallpapers/wall.jpg";
+  stylix.image = ''/home/ksgm/nixos/users/ksgm/assets/wallpapers/wall.jpg'';
   stylix.polarity = "light";
 
   # Some programs need SUID wrappers, can be configured further or are
