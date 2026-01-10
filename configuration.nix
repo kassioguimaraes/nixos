@@ -5,25 +5,34 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [ # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
+  boot.initrd.systemd.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.plymouth.enable = true;
 
-security.pam.services.hyprlock = {};
-#environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  #security
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.ksgm.enableGnomeKeyring = true;
+  services.displayManager.gdm.enable = true;
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "ksgm";
+  };
+
+
+  #environment.sessionVariables.NIXOS_OZONE_WL = "1";
   programs.hyprland.enable = true;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
 
-
   boot.kernelParams = [ "quiet" "splash" ];
 
-  boot.initrd.luks.devices."luks-8b1f2dc2-3daf-497c-9e94-737157c54d85".device = "/dev/disk/by-uuid/8b1f2dc2-3daf-497c-9e94-737157c54d85";
+  boot.initrd.luks.devices."luks-8b1f2dc2-3daf-497c-9e94-737157c54d85".device =
+    "/dev/disk/by-uuid/8b1f2dc2-3daf-497c-9e94-737157c54d85";
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -40,7 +49,7 @@ security.pam.services.hyprlock = {};
 
   # Enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.settings.auto-optimise-store = true;  
+  nix.settings.auto-optimise-store = true;
   # Enable networking
   networking.networkmanager.enable = true;
   networking.wireless.iwd.enable = true;
@@ -69,8 +78,6 @@ security.pam.services.hyprlock = {};
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.displayManager.gdm.enable = true;
-  
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -108,9 +115,10 @@ security.pam.services.hyprlock = {};
     isNormalUser = true;
     description = "Kassio Guimaraes";
     extraGroups = [ "networkmanager" "wheel" "docker" "video" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
+    packages = with pkgs;
+      [
+        #  thunderbird
+      ];
   };
 
   # Install firefox.
@@ -121,18 +129,19 @@ security.pam.services.hyprlock = {};
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+      #  wget
+    ];
 
   #stylix
   stylix.enable = true;
-  stylix.image = ./users/ksgm/assets/wallpapers/alt.png;
+  stylix.image = ./users/ksgm/assets/wallpapers/wall.jpg;
   stylix.polarity = "dark";
   stylix.opacity = {
-    terminal = 0.8;
-    popups = 0.8;
+    terminal = 0.85;
+    popups = 0.85;
     desktop = 0.85;
   };
 

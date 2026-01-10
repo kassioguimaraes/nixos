@@ -4,14 +4,15 @@
   #imports = [ ./waybar.nix ];
   wayland.windowManager.hyprland = {
     enable = true;
-
     settings = {
+      env = [ "HYPRCURSOR_THEME,rose-pine-hyprcursor" "HYPRCURSOR_SIZE,24" ];
       monitor = "eDP-1, 1920x1080@60,0x0, 1.25";
       general = {
         layout = "master";
         gaps_in = 5;
         gaps_out = 10;
       };
+      xwayland = { force_zero_scaling = true; };
 
       decoration = {
         rounding = 20;
@@ -30,11 +31,18 @@
           vibrancy = 0.1696;
         };
       };
+      exec-once = [ "noctalia-shell" ];
 
       "$mod" = "SUPER";
       "$alt" = "ALT_L";
       "$terminal" = "kitty";
-      "$menu" = "rofi -show drun";
+      "$menu" = "noctalia-shell ipc call launcher toggle";
+      "$clipboard" = "noctalia-shell ipc call clipboard toggle";
+      "$controlcenter" = "noctalia-shell ipc call controlCenter toggle";
+      "$sessionMenu" = "noctalia-shell ipc call sessionMenu toggle";
+      "$lock" = "noctalia-shell ipc call sessionMenu lockAndSuspend";
+      "$wifi" = "noctalia-shell ipc call network togglePanel";
+      "$bluetooth" = "noctalia-shell ipc call bluetooth togglePanel";
 
       input = {
         "kb_model" = "pc104";
@@ -44,11 +52,21 @@
       };
       master = { "mfact" = 0.55; };
 
+      binds = { movefocus_cycles_fullscreen = true; };
+
       bind = [
         "$mod, RETURN, exec, kitty"
         "$mod SHIFT, C, killactive"
-        "$mod, F, togglefloating"
+        "$mod, SPACE, togglefloating"
+        "$mod, F, fullscreen,1 "
+        "$mod SHIFT, F, fullscreen "
         "$alt, Q, exec,$menu"
+        "$alt, V, exec,$clipboard"
+        "$mod SHIFT, S, exec,$controlcenter"
+        "$mod SHIFT, L, exec,$lock"
+        "$mod SHIFT, P, exec,$sessionMenu"
+        "$mod SHIFT, W, exec,$wifi"
+        "$mod SHIFT, B, exec,$bluetooth"
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
@@ -61,7 +79,7 @@
         "$mod, J,layoutmsg, cyclenext"
         "$mod, K,layoutmsg, cycleprev"
         "$mod SHIFT, J, layoutmsg, swapnext"
-        "$mod, SHIFT K, layoutmsg, swapprev"
+        "$mod SHIFT K, layoutmsg, swapnext,prev"
         "$mod, O, layoutmsg, addmaster"
         "$mod SHIFT, O, layoutmsg, removemaster"
       ];
@@ -84,15 +102,28 @@
       windowrule =
         "float, center, size 70% 70%, pin, opacity 0.92, class:tuiterm";
     };
+    extraConfig = ''
+        bind = $mod, R,submap, resize
+        submap = resize
+            binde = ,L, resizeactive, 20 0
+            binde = ,H, resizeactive, -20 0
+            binde = ,J, resizeactive, 0 -20
+            binde = ,K, resizeactive, 0 20
+            binde = ,Return,submap,reset
+            bind = , escape, submap, reset
+            bind = , Return, submap, reset
+            bind = $mod,R , submap, reset
+       submap = reset
+    '';
   };
 
   home.packages = with pkgs; [
     btop
     waybar
-    rofi
     playerctl
     brightnessctl
     impala
     bluetui
+    rose-pine-hyprcursor
   ];
 }

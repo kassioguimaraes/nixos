@@ -1,6 +1,6 @@
 { config, pkgs, ... }: {
 
-  home.packages = with pkgs; [ matugen ];
+  home.packages = with pkgs; [ matugen cava wlsunset evolution-data-server cliphist xdg-desktop-portal  ];
   programs.noctalia-shell = {
     enable = true;
     settings = {
