@@ -40,7 +40,8 @@
       "$clipboard" = "noctalia-shell ipc call clipboard toggle";
       "$controlcenter" = "noctalia-shell ipc call controlCenter toggle";
       "$sessionMenu" = "noctalia-shell ipc call sessionMenu toggle";
-      "$lock" = "noctalia-shell ipc call sessionMenu lockAndSuspend";
+      "$suspend" = "noctalia-shell ipc call sessionMenu lockAndSuspend";
+      "$lock" = "noctalia-shell ipc call sessionMenu lock";
       "$wifi" = "noctalia-shell ipc call network togglePanel";
       "$bluetooth" = "noctalia-shell ipc call bluetooth togglePanel";
 
@@ -55,6 +56,15 @@
       binds = { movefocus_cycles_fullscreen = true; };
 
       bind = [
+        #noctalia
+        "$mod SHIFT, S, exec,$controlcenter"
+        "$mod SHIFT, L, exec,$lock"
+        "$mod CTRL, L, exec,$suspend"
+        "$mod SHIFT, P, exec,$sessionMenu"
+        "$mod SHIFT, W, exec,$wifi"
+        "$mod SHIFT, B, exec,$bluetooth"
+
+        #wm
         "$mod, RETURN, exec, kitty"
         "$mod SHIFT, C, killactive"
         "$mod, SPACE, togglefloating"
@@ -62,11 +72,6 @@
         "$mod SHIFT, F, fullscreen "
         "$alt, Q, exec,$menu"
         "$alt, V, exec,$clipboard"
-        "$mod SHIFT, S, exec,$controlcenter"
-        "$mod SHIFT, L, exec,$lock"
-        "$mod SHIFT, P, exec,$sessionMenu"
-        "$mod SHIFT, W, exec,$wifi"
-        "$mod SHIFT, B, exec,$bluetooth"
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
@@ -82,6 +87,14 @@
         "$mod SHIFT K, layoutmsg, swapnext,prev"
         "$mod, O, layoutmsg, addmaster"
         "$mod SHIFT, O, layoutmsg, removemaster"
+
+        #  Screenshots
+        ", Print, exec, grim - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy && swappy -f -"
+        "SHIFT, Print, exec, slurp | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy && swappy -f -"
+        "CTRL, Print, exec, slurp -w | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy && swappy -f -"
+        "ALT, Print, exec, grim - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
+        "ALT SHIFT, Print, exec, slurp | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
+        "ALT CTRL, Print, exec, slurp -w | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
       ];
       bindm = [ "$mod, mouse:272, movewindow" "$mod, mouse:273, resizewindow" ];
       bindel = [
@@ -103,17 +116,17 @@
         "float, center, size 70% 70%, pin, opacity 0.92, class:tuiterm";
     };
     extraConfig = ''
-        bind = $mod, R,submap, resize
-        submap = resize
-            binde = ,L, resizeactive, 20 0
-            binde = ,H, resizeactive, -20 0
-            binde = ,J, resizeactive, 0 -20
-            binde = ,K, resizeactive, 0 20
-            binde = ,Return,submap,reset
-            bind = , escape, submap, reset
-            bind = , Return, submap, reset
-            bind = $mod,R , submap, reset
-       submap = reset
+       bind = $mod, R,submap, resize
+       submap = resize
+           binde = ,L, resizeactive, 20 0
+           binde = ,H, resizeactive, -20 0
+           binde = ,J, resizeactive, 0 -20
+           binde = ,K, resizeactive, 0 20
+           binde = ,Return,submap,reset
+           bind = , escape, submap, reset
+           bind = , Return, submap, reset
+           bind = $mod,R , submap, reset
+      submap = reset
     '';
   };
 
@@ -125,5 +138,9 @@
     impala
     bluetui
     rose-pine-hyprcursor
+    grim
+    slurp
+    swappy
+    wl-clipboard
   ];
 }

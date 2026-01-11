@@ -16,10 +16,6 @@
     yazi
     fzf
     nerd-fonts.fantasque-sans-mono
-    xfce.thunar
-    xfce.thunar-archive-plugin
-    xfce.thunar-volman
-    xfce.thunar-media-tags-plugin
     unrar-free
     fastfetch
     sxiv

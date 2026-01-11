@@ -24,7 +24,6 @@
     user = "ksgm";
   };
 
-
   #environment.sessionVariables.NIXOS_OZONE_WL = "1";
   programs.hyprland.enable = true;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
@@ -33,7 +32,7 @@
 
   boot.initrd.luks.devices."luks-8b1f2dc2-3daf-497c-9e94-737157c54d85".device =
     "/dev/disk/by-uuid/8b1f2dc2-3daf-497c-9e94-737157c54d85";
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "workpc"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   #power
@@ -47,13 +46,12 @@
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  # Enable flakes
+  # Nix settings
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
+   nix.settings.trusted-users = [ "root" "ksgm" ];
   # Enable networking
   networking.networkmanager.enable = true;
-  networking.wireless.iwd.enable = true;
-  networking.networkmanager.wifi.backend = "iwd";
   hardware.bluetooth.enable = true;
 
   # Set your time zone.
@@ -117,13 +115,22 @@
     extraGroups = [ "networkmanager" "wheel" "docker" "video" ];
     packages = with pkgs;
       [
-        #  thunderbird
+        ffmpegthumbnailer
+        poppler
+        webp-pixbuf-loader
       ];
   };
 
   # Install firefox.
   programs.firefox.enable = true;
 
+  #file manager
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs.xfce; [ thunar-archive-plugin thunar-volman thunar-media-tags-plugin ];
+  };
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -136,13 +143,33 @@
     ];
 
   #stylix
-  stylix.enable = true;
-  stylix.image = ./users/ksgm/assets/wallpapers/wall.jpg;
-  stylix.polarity = "dark";
-  stylix.opacity = {
-    terminal = 0.85;
-    popups = 0.85;
-    desktop = 0.85;
+  stylix = {
+    enable = true;
+    image = ./users/ksgm/assets/wallpapers/wall.jpg;
+    polarity = "dark";
+    opacity = {
+      terminal = 0.85;
+      popups = 0.85;
+      desktop = 0.85;
+    };
+    fonts = {
+      serif = {
+        package = pkgs.dejavu_fonts;
+        name = "Dejavu Serif";
+      };
+      sansSerif = {
+        package = pkgs.dejavu_fonts;
+        name = "Dejavu Sans";
+      };
+      monospace = {
+        package = pkgs.nerd-fonts.fantasque-sans-mono;
+        name = "FantasqueSansMono Nerd Font";
+      };
+      emoji = {
+        package = pkgs.google-fonts;
+        name = "Noto Color Emoji";
+      };
+    };
   };
 
   # Some programs need SUID wrappers, can be configured further or are
