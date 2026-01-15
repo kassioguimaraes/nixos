@@ -38,10 +38,10 @@
 
   stylix = {
     enable = true;
-    image = ../home/assets/wallpapers/third.png;
+    image = ../home/assets/wallpapers/fourth.jpg;
     polarity = "dark";
     opacity = {
-      terminal = 0.85;
+      terminal = 0.95;
       popups = 0.85;
       desktop = 0.85;
     };

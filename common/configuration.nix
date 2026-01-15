@@ -33,7 +33,10 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
   # Enable networking
-  networking.networkmanager.enable = true;
+  networking.networkmanager = {
+    enable = true;
+    plugins = with pkgs; [ networkmanager-openvpn ];
+  };
   hardware.bluetooth.enable = true;
 
   # Set your time zone.
@@ -82,14 +85,17 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-
   # Install firefox.
   programs.firefox.enable = true;
 
   #file manager
   programs.thunar = {
     enable = true;
-    plugins = with pkgs.xfce; [ thunar-archive-plugin thunar-volman thunar-media-tags-plugin ];
+    plugins = with pkgs.xfce; [
+      thunar-archive-plugin
+      thunar-volman
+      thunar-media-tags-plugin
+    ];
   };
 
   services.gvfs.enable = true;
@@ -103,8 +109,8 @@
     [
       #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       #  wget
+      networkmanagerapplet
     ];
-
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

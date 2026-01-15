@@ -18,4 +18,5 @@
       "DP-2,1920x1080@60,1920x0,1.0"
     ];
   };
+  programs.vesktop.enable = true;
 }

@@ -4,6 +4,7 @@
   imports = [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ];
   # User packages
   home.packages = with pkgs; [
+    bitwarden-desktop
     git
     vim
     curl
@@ -36,6 +37,7 @@
       fi
     '';
   };
+  programs.discord.enable = true;
 
   services = {
     copyq.enable = true;

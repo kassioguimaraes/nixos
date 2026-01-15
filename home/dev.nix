@@ -2,6 +2,7 @@
 
 {
   home.packages = with pkgs; [
+    sshpass
     vscode
     tmux
     tmux-sessionizer

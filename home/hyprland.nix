@@ -40,7 +40,7 @@
       "$controlcenter" = "noctalia-shell ipc call controlCenter toggle";
       "$sessionMenu" = "noctalia-shell ipc call sessionMenu toggle";
       "$suspend" = "noctalia-shell ipc call sessionMenu lockAndSuspend";
-      "$lock" = "noctalia-shell ipc call sessionMenu lock";
+      "$lock" = "noctalia-shell ipc call sessionMenu Lock";
       "$wifi" = "noctalia-shell ipc call network togglePanel";
       "$bluetooth" = "noctalia-shell ipc call bluetooth togglePanel";
 
@@ -94,6 +94,9 @@
         "ALT, Print, exec, grim - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
         "ALT SHIFT, Print, exec, slurp | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
         "ALT CTRL, Print, exec, slurp -w | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
+
+        #discord. set ppt to shift_r
+        ", Shift_R, pass, class:^(discord)$"
       ];
       bindm = [ "$mod, mouse:272, movewindow" "$mod, mouse:273, resizewindow" ];
       bindel = [
