@@ -87,13 +87,10 @@
         "$mod, O, layoutmsg, addmaster"
         "$mod SHIFT, O, layoutmsg, removemaster"
 
-        #  Screenshots
-        ", Print, exec, grim - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy && swappy -f -"
-        "SHIFT, Print, exec, slurp | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy && swappy -f -"
-        "CTRL, Print, exec, slurp -w | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy && swappy -f -"
-        "ALT, Print, exec, grim - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
-        "ALT SHIFT, Print, exec, slurp | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
-        "ALT CTRL, Print, exec, slurp -w | grim -g - - | tee $HOME/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png | wl-copy"
+        #screenshots
+        ", Print, exec, hyprshot -m output --raw | swappy -f -"
+        "CTRL, Print, exec, hyprshot -m window --raw | swappy -f -"
+        "SHIFT, Print, exec, hyprshot -m region --raw | swappy -f -"
 
         #discord. set ppt to shift_r
         ", Shift_R, pass, class:^(discord)$"
@@ -140,9 +137,8 @@
     impala
     bluetui
     rose-pine-hyprcursor
-    grim
-    slurp
     swappy
     wl-clipboard
+    hyprshot
   ];
 }
