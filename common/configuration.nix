@@ -5,9 +5,6 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -17,23 +14,13 @@
 
   #security
   services.gnome.gnome-keyring.enable = true;
-  security.pam.services.ksgm.enableGnomeKeyring = true;
   services.displayManager.gdm.enable = true;
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "ksgm";
-  };
 
   #environment.sessionVariables.NIXOS_OZONE_WL = "1";
   programs.hyprland.enable = true;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
 
   boot.kernelParams = [ "quiet" "splash" ];
-
-  boot.initrd.luks.devices."luks-8b1f2dc2-3daf-497c-9e94-737157c54d85".device =
-    "/dev/disk/by-uuid/8b1f2dc2-3daf-497c-9e94-737157c54d85";
-  networking.hostName = "desktop"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   #power
   services.power-profiles-daemon.enable = true;
@@ -49,7 +36,6 @@
   # Nix settings
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
-   nix.settings.trusted-users = [ "root" "ksgm" ];
   # Enable networking
   networking.networkmanager.enable = true;
   hardware.bluetooth.enable = true;
@@ -74,13 +60,6 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-
-  # Enable the GNOME Desktop Environment.
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "br";
-  };
 
   # Configure console keymap
   console.keyMap = "br-abnt2";
@@ -107,18 +86,6 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.ksgm = {
-    isNormalUser = true;
-    description = "Kassio Guimaraes";
-    extraGroups = [ "networkmanager" "wheel" "docker" "video" ];
-    packages = with pkgs;
-      [
-        ffmpegthumbnailer
-        poppler
-        webp-pixbuf-loader
-      ];
-  };
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -128,6 +95,7 @@
     enable = true;
     plugins = with pkgs.xfce; [ thunar-archive-plugin thunar-volman thunar-media-tags-plugin ];
   };
+
   services.gvfs.enable = true;
   services.tumbler.enable = true;
   # Allow unfree packages
@@ -141,35 +109,6 @@
       #  wget
     ];
 
-  #stylix
-  stylix = {
-    enable = true;
-    image = ./users/ksgm/assets/wallpapers/wall.jpg;
-    polarity = "dark";
-    opacity = {
-      terminal = 0.85;
-      popups = 0.85;
-      desktop = 0.85;
-    };
-    fonts = {
-      serif = {
-        package = pkgs.dejavu_fonts;
-        name = "Dejavu Serif";
-      };
-      sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "Dejavu Sans";
-      };
-      monospace = {
-        package = pkgs.nerd-fonts.fantasque-sans-mono;
-        name = "FantasqueSansMono Nerd Font";
-      };
-      emoji = {
-        package = pkgs.google-fonts;
-        name = "Noto Color Emoji";
-      };
-    };
-  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

@@ -1,5 +1,5 @@
 {
-  description = "Kassio's NixOS configuration";
+  description = "Kassio's NixOS configurations";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -21,25 +21,46 @@
   };
 
   outputs = inputs@{ self, nixpkgs, stylix, home-manager, nixvim, ... }:
-    let system = "x86_64-linux";
+    let
+      system = "x86_64-linux";
+      # Shared modules for all hosts
+      sharedModules = [
+	./common/configuration.nix
+        stylix.nixosModules.stylix
+        home-manager.nixosModules.home-manager
+        nixvim.nixosModules.nixvim
+        {
+          nixpkgs.config.allowUnfree = true;
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.sharedModules = [
+            nixvim.homeManagerModules.nixvim
+            inputs.noctalia.homeModules.default
+          ];
+        }
+      ];
     in {
-      nixpkgs.config.allowUnfree = true;
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          stylix.nixosModules.stylix
-          ./configuration.nix
-          home-manager.nixosModules.home-manager
-          nixvim.nixosModules.nixvim
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.sharedModules =
-              [ nixvim.homeModules.nixvim inputs.noctalia.homeModules.default ];
+      nixosConfigurations = {
+        laptop = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = sharedModules ++ [
+ ./hosts/laptop/configuration-laptop.nix
+{
+          home-manager.users.ksgm = import ./home/home-laptop.nix;
+}
+ ];
+        };
 
-            home-manager.users.ksgm = import ./users/ksgm/home.nix;
-          }
-        ];
+        desktop = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = sharedModules ++ [
+ ./hosts/desktop/configuration-desktop.nix
+{
+          home-manager.users.kassio = import ./home/home-desktop.nix;
+}
+
+ ];
+        };
       };
     };
 }
