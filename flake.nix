@@ -34,7 +34,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.sharedModules = [
-            nixvim.homeManagerModules.nixvim
+            nixvim.homeModules.nixvim
             inputs.noctalia.homeModules.default
           ];
         }
@@ -44,17 +44,17 @@
         laptop = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = sharedModules ++ [
- ./hosts/laptop/configuration-laptop.nix
-{
-          home-manager.users.ksgm = import ./home/home-laptop.nix;
-}
+	 ./laptop/configuration-laptop.nix
+	{
+		  home-manager.users.ksgm = import ./home/home-laptop.nix;
+	}
  ];
         };
 
         desktop = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = sharedModules ++ [
- ./hosts/desktop/configuration-desktop.nix
+ ./desktop/configuration-desktop.nix
 {
           home-manager.users.kassio = import ./home/home-desktop.nix;
 }

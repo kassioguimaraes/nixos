@@ -2,10 +2,6 @@
 
 {
   imports = [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ];
-  home.username = "ksgm";
-  home.homeDirectory = "/home/ksgm";
-  home.stateVersion = "25.11";
-
   # User packages
   home.packages = with pkgs; [
     git

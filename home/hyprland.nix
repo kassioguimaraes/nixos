@@ -6,7 +6,6 @@
     enable = true;
     settings = {
       env = [ "HYPRCURSOR_THEME,rose-pine-hyprcursor" "HYPRCURSOR_SIZE,24" ];
-      monitor = "eDP-1, 1920x1080@60,0x0, 1.25";
       general = {
         layout = "master";
         gaps_in = 5;

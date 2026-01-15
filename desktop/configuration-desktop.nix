@@ -1,9 +1,6 @@
-{ config, pkgs, ... }:
-  imports = [
-    ./hardware-configuration-desktop.nix
-  ];
+{ config, pkgs, ... }: {
+  imports = [ ./hardware-configuration-desktop.nix ];
 
-{
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   services.xserver.xkb = {
@@ -15,13 +12,33 @@
     isNormalUser = true;
     description = "Kassio Guimaraes";
     extraGroups = [ "networkmanager" "wheel" "video" "docker" ];
-    packages = with pkgs; [
-    ];
+    packages = with pkgs; [ ];
   };
+  # hardware stuff
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia = {
+    modesetting.enable = true;
+    open = true;
+  };
+  #gaming
+  programs.steam = {
+    enable = true;
+    gamescopeSession.enable = true;
+    remotePlay.openFirewall = true;
+    extraCompatPackages = with pkgs; [ proton-ge-bin ];
+  };
+
+  environment.systemPackages = with pkgs; [ mangohud ];
+
+  programs.gamemode.enable = true;
 
   stylix = {
     enable = true;
-    image = ../home/assets/wallpapers/fourth.jpg;
+    image = ../home/assets/wallpapers/third.png;
     polarity = "dark";
     opacity = {
       terminal = 0.85;
