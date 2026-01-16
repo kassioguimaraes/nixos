@@ -5,7 +5,12 @@
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
-      env = [ "HYPRCURSOR_THEME,rose-pine-hyprcursor" "HYPRCURSOR_SIZE,24" ];
+      env = [ 
+        "HYPRCURSOR_THEME,rose-pine-hyprcursor"
+        "HYPRCURSOR_SIZE,24"
+        "XCURSOR_SIZE, 24"
+        "XCURSOR_THEME BreezeX-RosePine-Linux"
+      ];
       general = {
         layout = "master";
         gaps_in = 5;
@@ -36,11 +41,11 @@
       "$alt" = "ALT_L";
       "$terminal" = "kitty";
       "$menu" = "noctalia-shell ipc call launcher toggle";
-      "$clipboard" = "noctalia-shell ipc call clipboard toggle";
+      "$clipboard" = "noctalia-shell ipc call launcher clipboard";
       "$controlcenter" = "noctalia-shell ipc call controlCenter toggle";
       "$sessionMenu" = "noctalia-shell ipc call sessionMenu toggle";
       "$suspend" = "noctalia-shell ipc call sessionMenu lockAndSuspend";
-      "$lock" = "noctalia-shell ipc call sessionMenu Lock";
+      "$lock" = "noctalia-shell ipc call sessionMenu lock";
       "$wifi" = "noctalia-shell ipc call network togglePanel";
       "$bluetooth" = "noctalia-shell ipc call bluetooth togglePanel";
 
@@ -111,8 +116,6 @@
         ", XF86AudioPlay, exec, playerctl play-pause"
         ", XF86AudioPrev, exec, playerctl previous"
       ];
-      windowrule =
-        "float, center, size 70% 70%, pin, opacity 0.92, class:tuiterm";
     };
     extraConfig = ''
        bind = $mod, R,submap, resize
@@ -140,5 +143,6 @@
     swappy
     wl-clipboard
     hyprshot
+    rose-pine-cursor
   ];
 }
