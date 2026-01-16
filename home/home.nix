@@ -15,6 +15,7 @@
     unrar-free
     fastfetch
     sxiv
+    eza
   ];
 
   programs.btop = {
@@ -23,7 +24,7 @@
   programs.kitty = {
     enable = true;
     settings = {
-      window_padding_width = "1 4";
+      window_padding_width = "3 6";
     };
   };
   programs.rofi.enable = true;

@@ -18,26 +18,38 @@
       bar = {
         density = "compact";
         showCapsule = false;
+        floating = true;
         outerCorners = false;
         widgets = {
           left = [
-            {
-              id = "Launcher";
-              useDistroLogo = true;
-            }
+            { id = "Launcher"; }
             { id = "Workspace"; }
-            { id = "ActiveWindow"; }
+            { id = "ActiveWindow";
+              colorizeIcons = true;
+              maxWidth = 400;
+            }
           ];
           center = [{ id = "Clock"; }];
           right = [
-            { id = "MediaMini"; }
+            {
+              id = "MediaMini";
+              maxWidth = 250;
+              compactMode = true;
+              showVisualizer = true;
+              visualizerType = "wave";
+            }
             { id = "ScreenRecorder"; }
-            { id = "Tray"; }
+            { id = "Tray";
+              colorizeIcons = true;
+            }
             { id = "NotificationHistory"; }
             { id = "Battery"; }
             { id = "Brightness"; }
             { id = "Volume"; }
-            { id = "ControlCenter"; }
+            {
+              id = "ControlCenter";
+              useDistroLogo = true;
+            }
           ];
         };
       };

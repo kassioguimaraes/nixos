@@ -14,7 +14,7 @@
       general = {
         layout = "master";
         gaps_in = 5;
-        gaps_out = 10;
+        gaps_out = 5;
       };
       xwayland = { force_zero_scaling = true; };
 
