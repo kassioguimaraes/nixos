@@ -6,6 +6,7 @@
     wlsunset
     evolution-data-server
     xdg-desktop-portal
+    qt6Packages.qt6ct
   ];
   services.cliphist.enable = true;
   programs.noctalia-shell = {

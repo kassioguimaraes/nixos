@@ -8,8 +8,6 @@
       env = [ 
         "HYPRCURSOR_THEME,rose-pine-hyprcursor"
         "HYPRCURSOR_SIZE,24"
-        "XCURSOR_SIZE, 24"
-        "XCURSOR_THEME BreezeX-RosePine-Linux"
       ];
       general = {
         layout = "master";
@@ -19,13 +17,12 @@
       xwayland = { force_zero_scaling = true; };
 
       decoration = {
-        rounding = 20;
+        rounding = 10;
         rounding_power = 2;
         shadow = {
           enabled = true;
           range = 4;
           render_power = 3;
-
         };
 
         blur = {

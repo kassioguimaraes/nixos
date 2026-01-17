@@ -15,7 +15,19 @@
     extraGroups = [ "networkmanager" "wheel" "video" "docker" ];
     packages = with pkgs; [ ];
   };
-  # hardware stuff
+
+  #theming
+  stylix = {
+    image = ../home/assets/wallpapers/fourth.jpg;
+    icons = {
+      enable = true;
+      package = pkgs.tela-icon-theme;
+      light = "Tela-green";
+      dark = "Tela-green-dark";
+    };
+  };
+
+  # video card stuff
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -26,6 +38,13 @@
     modesetting.enable = true;
     open = true;
   };
+
+  hardware.graphics.extraPackages = with pkgs; [
+    nvidia-vaapi-driver
+    libvdpau-va-gl
+    libva-vdpau-driver
+  ];
+
   #gaming
   programs.steam = {
     enable = true;
@@ -56,13 +75,7 @@
   #  })
   #];
 
-  environment.systemPackages = with pkgs; [
-    mangohud
-    #kdePackages.kirigami
-    #libsForQt5.kirigami2
-    #libsForQt5.kirigami-addons
-    #kdePackages.kirigami-addons
-  ];
+  environment.systemPackages = with pkgs; [ mangohud ];
 
   #  (writeShellScriptBin "steamos-session" ''
   #    #!/bin/bash
@@ -91,34 +104,5 @@
   #];
 
   programs.gamemode.enable = true;
-
-  stylix = {
-    enable = true;
-    image = ../home/assets/wallpapers/fourth.jpg;
-    polarity = "dark";
-    opacity = {
-      terminal = 0.95;
-      popups = 0.85;
-      desktop = 0.85;
-    };
-    fonts = {
-      serif = {
-        package = pkgs.dejavu_fonts;
-        name = "Dejavu Serif";
-      };
-      sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "Dejavu Sans";
-      };
-      monospace = {
-        package = pkgs.nerd-fonts.fantasque-sans-mono;
-        name = "FantasqueSansMono Nerd Font";
-      };
-      emoji = {
-        package = pkgs.google-fonts;
-        name = "Noto Color Emoji";
-      };
-    };
-  };
 
 }

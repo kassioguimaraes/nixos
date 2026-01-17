@@ -41,8 +41,6 @@
   programs.discord.enable = true;
 
   services = {
-    copyq.enable = true;
-    flameshot.enable = true;
   };
 
   programs.home-manager.enable = true;

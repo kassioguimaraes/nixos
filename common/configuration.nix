@@ -22,6 +22,12 @@
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;
 
+  #graphics
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+
   # Docker
   virtualisation.docker.enable = true;
 
@@ -105,12 +111,50 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs;
-    [
-      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      #  wget
-      networkmanagerapplet
-    ];
+  environment.systemPackages = with pkgs; [
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
+    networkmanagerapplet
+    p7zip
+    unrar
+    zip
+    unzip
+    file-roller
+  ];
+
+  stylix = {
+    enable = true;
+    cursor = {
+      size = 24;
+      package = pkgs.rose-pine-cursor;
+      name = "BreezeX-RoséPine";
+    };
+    image = ../home/assets/wallpapers/fourth.jpg;
+    polarity = "dark";
+    opacity = {
+      terminal = 0.95;
+      popups = 0.85;
+      desktop = 0.85;
+    };
+    fonts = {
+      serif = {
+        package = pkgs.dejavu_fonts;
+        name = "Dejavu Serif";
+      };
+      sansSerif = {
+        package = pkgs.dejavu_fonts;
+        name = "Dejavu Sans";
+      };
+      monospace = {
+        package = pkgs.nerd-fonts.fantasque-sans-mono;
+        name = "FantasqueSansMono Nerd Font";
+      };
+      emoji = {
+        package = pkgs.noto-fonts-color-emoji;
+        name = "Noto Color Emoji";
+      };
+    };
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
