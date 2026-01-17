@@ -2,7 +2,10 @@
   plugins = {
     easyescape.enable = true;
     flash.enable = true;
-    #lualine = { enable = true; };
+    lualine = {
+      enable = true;
+      settings.options.theme = "auto";
+    };
     # better-escape = {
     #   enable = true;
     #   settings.mappings = {
@@ -87,6 +90,11 @@
     };
     #git
     lazygit.enable = true;
+    toggleterm = {
+      enable = true;
+      settings.direction = "float";
+      settings.close_on_exit = true;
+    };
     diffview.enable = true;
     gitblame = {
       enable = true;
