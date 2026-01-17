@@ -127,7 +127,7 @@
     cursor = {
       size = 24;
       package = pkgs.rose-pine-cursor;
-      name = "BreezeX-RoséPine";
+      name = "BreezeX-RosePine";
     };
     image = ../home/assets/wallpapers/fourth.jpg;
     polarity = "dark";

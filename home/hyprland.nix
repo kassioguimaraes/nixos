@@ -4,15 +4,20 @@
   #imports = [ ./waybar.nix ];
   wayland.windowManager.hyprland = {
     enable = true;
+    plugins = with pkgs.hyprlandPlugins; [ hyprsplit ];
     settings = {
-      env = [ 
-        "HYPRCURSOR_THEME,rose-pine-hyprcursor"
-        "HYPRCURSOR_SIZE,24"
-      ];
+      env = [ "HYPRCURSOR_THEME,rose-pine-hyprcursor" "HYPRCURSOR_SIZE,24" ];
+      plugin = {
+        hyprsplit = {
+          num_workspaces = 4;
+          persistent_workspaces = true;
+        };
+      };
+
       general = {
         layout = "master";
-        gaps_in = 5;
-        gaps_out = 5;
+        gaps_in = 3;
+        gaps_out = 6;
       };
       xwayland = { force_zero_scaling = true; };
 
@@ -73,14 +78,20 @@
         "$mod SHIFT, F, fullscreen "
         "$alt, Q, exec,$menu"
         "$alt, V, exec,$clipboard"
-        "$mod, 1, workspace, 1"
-        "$mod, 2, workspace, 2"
-        "$mod, 3, workspace, 3"
-        "$mod, 4, workspace, 4"
-        "$mod SHIFT, 1, movetoworkspace, 1"
-        "$mod SHIFT, 2, movetoworkspace, 2"
-        "$mod SHIFT, 3, movetoworkspace, 3"
-        "$mod SHIFT, 4, movetoworkspace, 4"
+        "$mod, 1, split:workspace, 1"
+        "$mod, 2, split:workspace, 2"
+        "$mod, 3, split:workspace, 3"
+        "$mod, 4, split:workspace, 4"
+        "$mod, 5, split:workspace, 5"
+        "$mod SHIFT, 1, split:movetoworkspace, 1"
+        "$mod SHIFT, 2, split:movetoworkspace, 2"
+        "$mod SHIFT, 3, split:movetoworkspace, 3"
+        "$mod SHIFT, 4, split:movetoworkspace, 4"
+        "$mod SHIFT, 5, split:movetoworkspace, 4"
+        "$mod ,a, focusmonitor, -1"
+        "$mod ,s, focusmonitor, +1"
+        "$mod SHIFT ,a, movewindow, mon:-1"
+        "$mod SHIFT ,s, movewindow, mon:+1"
         "$mod, I,layoutmsg, swapwithmaster ignoremaster"
         "$mod, J,layoutmsg, cyclenext"
         "$mod, K,layoutmsg, cycleprev"

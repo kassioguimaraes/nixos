@@ -20,5 +20,15 @@
       key = "<F5>";
       mode = [ "n" ];
     }
+    {
+      action = ''<cmd>TermExec cmd="exec lazydocker" lazysql<CR>'';
+      key = "<F6>";
+      mode = [ "n" ];
+    }
+    {
+      action = ''<cmd>TermExec cmd="exec lazysql" name=lazysql<CR>'';
+      key = "<F7>";
+      mode = [ "n" ];
+    }
   ];
 }

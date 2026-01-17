@@ -9,6 +9,7 @@
     nodejs_24
     lazygit
     lazydocker
+    lazysql
     docker-compose
     bun
     sqlite
