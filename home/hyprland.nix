@@ -126,7 +126,7 @@
       ];
       windowrule = [
         {
-          name ="floatingmodal";
+          name = "floatingmodal";
           match.modal = 1;
           float = true;
           center = true;
@@ -157,6 +157,16 @@
           match.title = ".*File Operation Progress";
           float = true;
           center = true;
+        }
+        {
+          name = "firefox pip";
+          match.title = ".*Picture-in-Picture";
+          float = true;
+          center = false;
+          pin = true;
+          move = "100%-w-10 40"; 
+          size = "25% 15%";
+          content = "video";
         }
       ];
     };
