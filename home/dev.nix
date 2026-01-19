@@ -28,6 +28,7 @@
     package = pkgs.gitMinimal;
     lfs.enable = true;
     settings = {
+      core.askPass = "";
       user.name = "Kassio Guimaraes";
       user.email = "kassio@tuta.com";
     };

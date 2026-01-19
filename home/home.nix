@@ -18,13 +18,12 @@
     eza
   ];
 
-  programs.btop = {
-    enable = true;
-  };
+  programs.btop = { enable = true; };
   programs.kitty = {
     enable = true;
     settings = {
       window_padding_width = "3 6";
+      term = "xterm-256color";
     };
   };
   programs.rofi.enable = true;
@@ -40,8 +39,7 @@
   };
   programs.discord.enable = true;
 
-  services = {
-  };
+  services = { };
 
   programs.home-manager.enable = true;
 
