@@ -124,6 +124,41 @@
         ", XF86AudioPlay, exec, playerctl play-pause"
         ", XF86AudioPrev, exec, playerctl previous"
       ];
+      windowrule = [
+        {
+          name ="floatingmodal";
+          match.modal = 1;
+          float = true;
+          center = true;
+        }
+
+        {
+          name = "dialogsandmore";
+          match.title = ".*(Dialog|dialog|About|Error|Warning).*";
+          float = true;
+          center = true;
+        }
+
+        {
+          name = "savefile";
+          match.title = ".*(Save|Open|Select|Choose).*";
+          float = true;
+          center = true;
+        }
+
+        {
+          name = "prefs";
+          match.title = ".*(Preferences|Settings|Options).*";
+          float = true;
+          center = true;
+        }
+        {
+          name = "thunar file";
+          match.title = ".*File Operation Progress";
+          float = true;
+          center = true;
+        }
+      ];
     };
     extraConfig = ''
        bind = $mod, R,submap, resize
@@ -138,6 +173,7 @@
            bind = $mod,R , submap, reset
       submap = reset
     '';
+    #floats
   };
 
   home.packages = with pkgs; [

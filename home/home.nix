@@ -5,7 +5,7 @@
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop
-    git
+    gitMinimal
     vim
     curl
     wget

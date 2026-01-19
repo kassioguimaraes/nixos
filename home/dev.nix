@@ -25,6 +25,8 @@
 
   programs.git = {
     enable = true;
+    package = pkgs.gitMinimal;
+    lfs.enable = true;
     settings = {
       user.name = "Kassio Guimaraes";
       user.email = "kassio@tuta.com";
