@@ -129,7 +129,7 @@
     cursor = {
       size = 24;
       package = pkgs.rose-pine-cursor;
-      name = "BreezeX-RosePine";
+      name = "BreezeX-RosePine-Linux";
     };
     image = ../home/assets/wallpapers/fourth.jpg;
     polarity = "dark";
@@ -140,12 +140,12 @@
     };
     fonts = {
       serif = {
-        package = pkgs.dejavu_fonts;
-        name = "Dejavu Serif";
+        package = pkgs.noto-fonts;
+        name = "Noto Serif";
       };
       sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "Dejavu Sans";
+        package = pkgs.noto-fonts;
+        name = "Noto Sans";
       };
       monospace = {
         package = pkgs.nerd-fonts.fantasque-sans-mono;
