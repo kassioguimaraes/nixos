@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+
+  imports = [ ./tmux.nix ];
   home.packages = with pkgs; [
     sshpass
     vscode

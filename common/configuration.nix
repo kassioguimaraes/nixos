@@ -117,6 +117,7 @@
     networkmanagerapplet
     noto-fonts
     noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
     p7zip
     unrar
     zip
