@@ -7,6 +7,7 @@
     evolution-data-server
     xdg-desktop-portal
     qt6Packages.qt6ct
+    gpu-screen-recorder
   ];
   services.cliphist.enable = true;
   programs.noctalia-shell = {
@@ -40,6 +41,7 @@
               visualizerType = "wave";
             }
             { id = "ScreenRecorder"; }
+            { id = "VPN"; }
             { id = "Tray";
               colorizeIcons = true;
             }

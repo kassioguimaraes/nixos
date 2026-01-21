@@ -43,6 +43,7 @@
     enable = true;
     plugins = with pkgs; [ networkmanager-openvpn ];
   };
+  networking.enableIPv6 = false;
   hardware.bluetooth.enable = true;
 
   # Set your time zone.
@@ -115,14 +116,17 @@
     #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     #  wget
     networkmanagerapplet
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-cjk-serif
     p7zip
     unrar
     zip
     unzip
     file-roller
+  ];
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    nerd-fonts.fantasque-sans-mono
   ];
 
   stylix = {
