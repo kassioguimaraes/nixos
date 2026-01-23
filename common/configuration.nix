@@ -121,6 +121,9 @@
     zip
     unzip
     file-roller
+    libreoffice-qt
+    hunspell
+    hunspellDicts.pt_BR
   ];
   fonts.packages = with pkgs; [
     noto-fonts
