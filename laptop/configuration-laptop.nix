@@ -4,6 +4,8 @@
   boot.initrd.luks.devices."luks-8b1f2dc2-3daf-497c-9e94-737157c54d85".device =
     "/dev/disk/by-uuid/8b1f2dc2-3daf-497c-9e94-737157c54d85";
 
+  boot.kernelParams = [ "quiet" "splash" ];
+
   security.pam.services.ksgm.enableGnomeKeyring = true;
   services.displayManager.autoLogin = {
     enable = true;

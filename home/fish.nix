@@ -2,7 +2,13 @@
 
 {
   programs.fish = {
-    interactiveShellInit = "set fish_greeting";
+    interactiveShellInit = ''
+      if status is-interactive
+        if not set -q TMUX
+          tmux attach-session -t general ^/dev/null; or tmg
+        end
+      end
+    '';
     shellAliases = {
       sf = "fastfetch";
       cl = "clear";
@@ -22,7 +28,6 @@
       gitfe = "git fetch";
       gitd = "git diff";
       nixconf = "cd ~/nixos && nvim";
-      yy = "yazi";
       f = "yy ~/";
       ff = "yy ~/code";
       fff = "yy .";

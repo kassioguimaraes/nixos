@@ -1,7 +1,8 @@
 { config, pkgs, ... }:
 
 {
-  imports = [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ];
+  imports =
+    [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ];
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop
@@ -23,6 +24,7 @@
     settings = {
       window_padding_width = "3 6";
       term = "xterm-256color";
+      confirm_os_window_close = "0";
     };
   };
   programs.rofi.enable = true;

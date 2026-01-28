@@ -16,7 +16,7 @@
   programs.hyprland.enable = true;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
 
-  boot.kernelParams = [ "quiet" "splash" ];
+  #boot.kernelParams = [ "quiet" "splash" ];
 
   #power
   services.power-profiles-daemon.enable = true;

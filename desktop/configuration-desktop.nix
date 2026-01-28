@@ -2,6 +2,7 @@
   imports = [ ./hardware-configuration-desktop.nix ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "quiet" "splash" "video=HDMI-A-1:d" ];
 
   services.xserver.xkb = {
     layout = "br";

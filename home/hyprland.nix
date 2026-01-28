@@ -14,6 +14,13 @@
         };
       };
 
+      workspace = [
+        "5, layoutopt:orientation:top"
+        "6, layoutopt:orientation:top"
+        "7, layoutopt:orientation:top"
+        "8, layoutopt:orientation:top"
+      ];
+
       general = {
         layout = "master";
         gaps_in = 3;
@@ -57,13 +64,13 @@
         "kb_variant" = "thinkpad";
         touchpad = { "natural_scroll" = true; };
       };
-      master = { "mfact" = 0.55; };
+      master = { "mfact" = 0.60; };
 
       binds = { movefocus_cycles_fullscreen = true; };
 
       bind = [
         #noctalia
-        "$mod SHIFT, S, exec,$controlcenter"
+        "$mod,escape , exec,$controlcenter"
         "$mod SHIFT, L, exec,$lock"
         "$mod CTRL, L, exec,$suspend"
         "$mod SHIFT, P, exec,$sessionMenu"
@@ -164,7 +171,7 @@
           float = true;
           center = false;
           pin = true;
-          move = "100%-w-10 40"; 
+          move = "100%-w-10 40";
           size = "25% 15%";
           content = "video";
         }
