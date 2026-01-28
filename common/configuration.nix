@@ -139,7 +139,6 @@
       package = pkgs.rose-pine-cursor;
       name = "BreezeX-RosePine-Linux";
     };
-    image = ../home/assets/wallpapers/fourth.jpg;
     polarity = "dark";
     opacity = {
       terminal = 0.95;

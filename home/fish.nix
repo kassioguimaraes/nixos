@@ -2,13 +2,7 @@
 
 {
   programs.fish = {
-    interactiveShellInit = ''
-      if status is-interactive
-        if not set -q TMUX
-          tmux attach-session -t general ^/dev/null; or tmg
-        end
-      end
-    '';
+    interactiveShellInit = "set fish_greeting";
     shellAliases = {
       sf = "fastfetch";
       cl = "clear";
@@ -39,6 +33,19 @@
       tmd = "tmux detach";
     };
     enable = true;
+    binds = {
+      "\\cl" = { # or "ctrl-l" if Home Manager parses it
+        command = "clear; commandline -f repaint";
+      };
+      "\\ca" = { # or "ctrl-a"
+        command = "cd ~/ && tmux new-session -A -s general";
+      };
+
+      #"\\cf" = {
+      #  command = "forward-char";
+      #  mode = "insert"; # Only one mode per binding
+      #};
+    };
     functions = {
       yy = ''
         set tmp (mktemp -t "yazi-cwd.XXXXXX")
@@ -49,13 +56,7 @@
         rm -f -- "$tmp"
       '';
 
-      __fish_user_key_bindings = ''
-
-        for mode in insert default visual
-            bind -M $mode \cf forward-char
-        end
-      '';
-
     };
+
   };
 }

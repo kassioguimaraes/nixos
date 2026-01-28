@@ -19,7 +19,7 @@
 
   #theming
   stylix = {
-    image = ../home/assets/wallpapers/fourth.jpg;
+    image = ../home/assets/wallpapers/gr.jpg;
     icons = {
       enable = true;
       package = pkgs.tela-icon-theme;
