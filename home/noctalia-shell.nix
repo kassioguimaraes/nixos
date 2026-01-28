@@ -28,7 +28,7 @@
             { id = "Workspace"; }
             { id = "ActiveWindow";
               colorizeIcons = true;
-              maxWidth = 400;
+              maxWidth = 250;
             }
           ];
           center = [{ id = "Clock"; }];
