@@ -9,6 +9,7 @@
     tmux
     tmux-sessionizer
     nodejs_24
+    python3
     lazygit
     lazydocker
     lazysql

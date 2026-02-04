@@ -7,6 +7,7 @@
   home.packages = with pkgs; [
     bitwarden-desktop
     gitMinimal
+    gimp3-with-plugins
     vim
     curl
     wget

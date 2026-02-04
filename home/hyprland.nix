@@ -138,21 +138,18 @@
           float = true;
           center = true;
         }
-
         {
           name = "dialogsandmore";
           match.title = ".*(Dialog|dialog|About|Error|Warning).*";
           float = true;
           center = true;
         }
-
         {
           name = "savefile";
           match.title = ".*(Save|Open|Select|Choose).*";
           float = true;
           center = true;
         }
-
         {
           name = "prefs";
           match.title = ".*(Preferences|Settings|Options).*";

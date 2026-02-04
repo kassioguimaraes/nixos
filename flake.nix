@@ -25,7 +25,7 @@
       system = "x86_64-linux";
       # Shared modules for all hosts
       sharedModules = [
-	./common/configuration.nix
+        ./common/configuration.nix
         stylix.nixosModules.stylix
         home-manager.nixosModules.home-manager
         nixvim.nixosModules.nixvim
@@ -33,10 +33,8 @@
           nixpkgs.config.allowUnfree = true;
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.sharedModules = [
-            nixvim.homeModules.nixvim
-            inputs.noctalia.homeModules.default
-          ];
+          home-manager.sharedModules =
+            [ nixvim.homeModules.nixvim inputs.noctalia.homeModules.default ];
         }
       ];
     in {
@@ -44,22 +42,18 @@
         laptop = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = sharedModules ++ [
-	 ./laptop/configuration-laptop.nix
-	{
-		  home-manager.users.ksgm = import ./home/home-laptop.nix;
-	}
- ];
+            ./laptop/configuration-laptop.nix
+            { home-manager.users.ksgm = import ./home/home-laptop.nix; }
+          ];
         };
 
         desktop = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = sharedModules ++ [
- ./desktop/configuration-desktop.nix
-{
-          home-manager.users.kassio = import ./home/home-desktop.nix;
-}
+            ./desktop/configuration-desktop.nix
+            { home-manager.users.kassio = import ./home/home-desktop.nix; }
 
- ];
+          ];
         };
       };
     };
