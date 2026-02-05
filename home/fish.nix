@@ -27,7 +27,6 @@
       fff = "yy .";
       sail = "[ -f sail ] && sh sail || sh vendor/bin/sail";
       venv = "source ./.venv/bin/activate";
-      tmns = "tmux new -A -s";
       tmg = "cd ~/ && tmux new-session -A -s general";
       tma = "tmux attach";
       tmd = "tmux detach";
@@ -55,7 +54,20 @@
         end
         rm -f -- "$tmp"
       '';
+      tmns = ''
+        set session $argv
+        if test -z "$session"
+            set session (basename (pwd))
+        end
 
+        if set -q TMUX
+            tmux has-session -t $session 2>/dev/null
+            or tmux new-session -d -s $session
+            tmux switch-client -t $session
+        else
+            tmux new -A -s $session
+        end
+      '';
     };
 
   };

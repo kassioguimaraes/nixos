@@ -40,6 +40,7 @@
     '';
   };
   programs.discord.enable = true;
+  stylix.targets.lazygit.colors.enable = false;
 
   services = { };
 

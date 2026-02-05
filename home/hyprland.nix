@@ -64,7 +64,7 @@
         "kb_variant" = "thinkpad";
         touchpad = { "natural_scroll" = true; };
       };
-      master = { "mfact" = 0.60; };
+      master = { "mfact" = 0.6; };
 
       binds = { movefocus_cycles_fullscreen = true; };
 
