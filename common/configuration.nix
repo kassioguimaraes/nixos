@@ -18,6 +18,8 @@
 
   #boot.kernelParams = [ "quiet" "splash" ];
 
+  #ld
+  programs.nix-ld.enable = true;
   #power
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;

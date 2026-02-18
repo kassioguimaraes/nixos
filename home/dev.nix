@@ -10,7 +10,6 @@
     tmux-sessionizer
     nodejs_24
     python3
-    lazygit
     lazydocker
     lazysql
     docker-compose
@@ -24,7 +23,17 @@
     php84Packages.composer
     laravel
     ripgrep
+    delta
   ];
+  programs.lazygit = {
+    enable = true;
+    enableFishIntegration = true;
+    settings = {
+      gui.theme = {
+        selectedLineBgColor = [ "bold" ];
+      };
+      git.pagers = [{ pager = "delta --line-numbers --features=colibri --paging=never"; }]; };
+  };
 
   programs.git = {
     enable = true;
@@ -36,6 +45,7 @@
       user.email = "kassio@tuta.com";
     };
   };
+  programs.delta.enableGitIntegration = true;
 
   programs.nixvim = {
     enable = true;
