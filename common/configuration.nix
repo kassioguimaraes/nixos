@@ -126,6 +126,9 @@
     libreoffice-qt
     hunspell
     hunspellDicts.pt_BR
+    nautilus
+    nautilus-open-any-terminal
+    evince
   ];
   fonts.packages = with pkgs; [
     noto-fonts

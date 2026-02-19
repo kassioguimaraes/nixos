@@ -1,16 +1,24 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   #imports = [ ./waybar.nix ];
   wayland.windowManager.hyprland = {
     enable = true;
-    plugins = with pkgs.hyprlandPlugins; [ hyprsplit ];
+    plugins = with pkgs.hyprlandPlugins; [ hyprsplit hyprexpo ];
     settings = {
       env = [ "HYPRCURSOR_THEME,rose-pine-hyprcursor" "HYPRCURSOR_SIZE,24" ];
       plugin = {
         hyprsplit = {
           num_workspaces = 4;
           persistent_workspaces = true;
+        };
+        hyprexpo = {
+          columns = 2;
+          gap_size = 5;
+          bg_col = "rgb(111111)";
+          workspace_method = "center current";
+
+          gesture_distance = 300;
         };
       };
 
@@ -85,6 +93,7 @@
         "$mod SHIFT, F, fullscreen "
         "$alt, Q, exec,$menu"
         "$alt, V, exec,$clipboard"
+        "$mod, TAB, hyprexpo:expo, toggle"
         "$mod, 1, split:workspace, 1"
         "$mod, 2, split:workspace, 2"
         "$mod, 3, split:workspace, 3"

@@ -31,8 +31,11 @@
     settings = {
       gui.theme = {
         selectedLineBgColor = [ "bold" ];
+        nerdFontsVersion = 3;
       };
-      git.pagers = [{ pager = "delta --line-numbers --features=colibri --paging=never"; }]; };
+      git.pagers =
+        [{ pager = "delta --line-numbers --features=colibri --paging=never"; }];
+    };
   };
 
   programs.git = {
