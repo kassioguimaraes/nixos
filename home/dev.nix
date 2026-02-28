@@ -24,6 +24,7 @@
     laravel
     ripgrep
     delta
+    codex
   ];
   programs.lazygit = {
     enable = true;

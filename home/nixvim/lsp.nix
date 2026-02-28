@@ -112,7 +112,6 @@
         diagnostics = {
 
           golangci_lint.enable = true;
-          phpstan.enable = true;
         };
       };
     };
