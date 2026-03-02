@@ -1,6 +1,7 @@
 { config, pkgs, ... }: {
 
   home.packages = with pkgs; [
+    wtype
     matugen
     cava
     wlsunset
@@ -15,6 +16,7 @@
     settings = {
       appLauncher = {
         enableClipboardHistory = true;
+        autoPasteClipboard = true;
         terminalCommand = "kitty -e";
       };
       bar = {

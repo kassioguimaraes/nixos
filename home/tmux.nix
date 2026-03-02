@@ -112,7 +112,7 @@ set -g status-right '#[bg=blue] #(date "+%H:%M") #[default]'
 # start 4
 new-session -n window1 -s mysession 'fish' \; \
   new-window -n window2 'fish' \; \
-  new-window -n window3 'fissh' \; \
+  new-window -n window3 'fish' \; \
   new-window -n window4 'fish'
 
 bind Tab display-popup -E "tms"

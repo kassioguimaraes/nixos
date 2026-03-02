@@ -23,17 +23,29 @@
         };
       };
 
+      hotkey-overlay = {
+        skip-at-startup = true;
+      };
+
       # Layout configuration
       layout = {
         gaps = 6;
-        center-focused-column = "always";
+        center-focused-column = "never";
         default-column-width = {
           proportion = 0.6;
         };
+        tab-indicator = {
+          active = { color = "#ffffff"; };
+          inactive = { color = "#808080"; };
+          width = 8;
+          gaps-between-tabs = 4;
+          position = "left";
+          place-within-column = true;
+        };
         preset-column-widths = [
-          { proportion = 1. / 3.; }
-          { proportion = 1. / 2.; }
-          { proportion = 3. / 4.; }
+          { proportion = 0.6; }
+          { proportion = 0.4; }
+          { proportion = 0.8; }
         ];
       };
 
@@ -136,13 +148,16 @@
         "Mod+Shift+O".action.reset-window-height = [ ];
         "Mod+I".action.consume-or-expel-window-left = [ ];
         "Mod+Shift+I".action.consume-or-expel-window-right = [ ];
-        "Mod+WheelScrollDown".action.focus-column-right = [];
-        "Mod+WheelScrollUp".action.focus-column-left = [];
-        "Mod+Shift+WheelScrollDown".action.focus-workspace-down = [];
-        "Mod+Shift+WheelScrollUp".action.focus-workspace-up = [];
+        "Mod+WheelScrollDown".action.focus-column-right = [ ];
+        "Mod+WheelScrollUp".action.focus-column-left = [ ];
+        "Mod+Shift+WheelScrollDown".action.focus-workspace-down = [ ];
+        "Mod+Shift+WheelScrollUp".action.focus-workspace-up = [ ];
 
         # Resize mode
         "Mod+R".action.switch-preset-column-width = [ ];
+
+        #tabbed
+        "Mod+T".action.toggle-column-tabbed-display = [ ];
 
         # Screenshots
         "Print".action.screenshot = [ ];
@@ -289,7 +304,7 @@
       ];
 
       # Decorations
-      prefer-no-csd = false;
+      prefer-no-csd = true;
 
       # Cursor
       cursor = {
