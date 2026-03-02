@@ -2,7 +2,7 @@
 
 {
   imports =
-    [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ];
+    [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ./niri.nix ];
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop
@@ -17,6 +17,9 @@
     fastfetch
     sxiv
     eza
+    nextcloud-client
+    obsidian
+    obsidian-export
   ];
 
   programs.btop = { enable = true; };

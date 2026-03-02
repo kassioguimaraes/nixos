@@ -52,7 +52,7 @@
           vibrancy = 0.1696;
         };
       };
-      exec-once = [ "noctalia-shell" ];
+      exec-once = [ "noctalia-shell" "nextcloud" ];
 
       "$mod" = "SUPER";
       "$alt" = "ALT_L";

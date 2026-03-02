@@ -25,6 +25,12 @@
     ripgrep
     delta
     codex
+    rustc
+    rust-analyzer
+    cargo
+    go
+    grpc
+    gcc
   ];
   programs.lazygit = {
     enable = true;
