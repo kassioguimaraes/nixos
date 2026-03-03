@@ -43,9 +43,9 @@
           place-within-column = true;
         };
         preset-column-widths = [
-          { proportion = 0.6; }
-          { proportion = 0.4; }
-          { proportion = 0.8; }
+          { proportion = 0.7; }
+          { proportion = 0.5; }
+          { proportion = 0.9; }
         ];
       };
 
@@ -141,9 +141,13 @@
 
         # Window focus and movement
         "Mod+K".action.focus-window-up = [ ];
+        "Mod+Shift+K".action.move-window-up = [ ];
         "Mod+J".action.focus-window-down = [ ];
+        "Mod+Shift+J".action.move-window-down = [ ];
         "Mod+H".action.focus-column-left = [ ];
+        "Mod+Shift+H".action.move-column-left = [ ];
         "Mod+L".action.focus-column-right = [ ];
+        "Mod+Shift+L".action.move-column-right = [ ];
         "Mod+O".action.switch-preset-window-height = [ ];
         "Mod+Shift+O".action.reset-window-height = [ ];
         "Mod+I".action.consume-or-expel-window-left = [ ];
@@ -154,7 +158,7 @@
         "Mod+Shift+WheelScrollUp".action.focus-workspace-up = [ ];
 
         # Resize mode
-        "Mod+R".action.switch-preset-column-width = [ ];
+        "Mod+U".action.switch-preset-column-width = [ ];
 
         #tabbed
         "Mod+T".action.toggle-column-tabbed-display = [ ];
