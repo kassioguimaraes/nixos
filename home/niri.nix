@@ -1,14 +1,19 @@
 {
   config,
   pkgs,
+  lib,
   inputs,
   ...
 }:
 
 {
   programs.niri = {
-    package = pkgs.niri; # Use nixpkgs version (binary cache available)
     settings = {
+      xwayland-satellite = {
+        enable = true;
+        path = lib.getExe pkgs.xwayland-satellite-unstable;
+      };
+
       # Input configuration
       input = {
         keyboard = {

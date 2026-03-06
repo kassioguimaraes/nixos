@@ -15,6 +15,7 @@
   #environment.sessionVariables.NIXOS_OZONE_WL = "1";
   programs.hyprland.enable = true;
   programs.niri.enable = true;
+  programs.niri.package = pkgs.niri-unstable;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
 
   #boot.kernelParams = [ "quiet" "splash" ];
