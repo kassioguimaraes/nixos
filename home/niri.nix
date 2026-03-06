@@ -40,8 +40,12 @@
           proportion = 0.6;
         };
         tab-indicator = {
-          active = { color = "#ffffff"; };
-          inactive = { color = "#808080"; };
+          active = {
+            color = "#ffffff";
+          };
+          inactive = {
+            color = "#808080";
+          };
           width = 8;
           gaps-between-tabs = 4;
           position = "left";
@@ -266,8 +270,21 @@
       window-rules = [
         # Floating modal windows
         {
+          geometry-corner-radius = {
+            top-left = 8.0;
+            top-right = 8.0;
+            bottom-left = 8.0;
+            bottom-right = 8.0;
+          };
+          clip-to-geometry = true;
+        }
+        {
           matches = [ { is-floating = true; } ];
           default-column-width = { };
+        }
+        {
+          matches = [ { is-active = false; } ];
+          opacity = 0.95;
         }
         # Dialogs
         {
