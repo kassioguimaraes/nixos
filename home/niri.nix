@@ -310,6 +310,13 @@
           matches = [ { title = ".*Picture-in-Picture.*"; } ];
           open-floating = true;
         }
+
+        # Firefox
+        {
+          matches = [ { app-id = "firefox"; } ];
+          open-maximized = true;
+        }
+
       ];
 
       # Decorations
