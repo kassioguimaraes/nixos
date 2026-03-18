@@ -16,7 +16,7 @@
     settings = {
       appLauncher = {
         enableClipboardHistory = true;
-        autoPasteClipboard = true;
+        autoPasteClipboard = false;
         terminalCommand = "kitty -e";
       };
       bar = {

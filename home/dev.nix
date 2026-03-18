@@ -17,6 +17,7 @@
     sqlite
     sqlitebrowser
     dbeaver-bin
+    tutanota-desktop
     postman
     devenv
     php84
@@ -29,6 +30,8 @@
     rust-analyzer
     cargo
     go
+    postgresql
+    mariadb.client
     grpc
     gcc
   ];

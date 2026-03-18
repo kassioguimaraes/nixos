@@ -91,7 +91,7 @@
           "sessionMenu"
           "toggle"
         ];
-        "Mod+Shift+W".action.spawn = [
+        "Mod+Shift+N".action.spawn = [
           "noctalia-shell"
           "ipc"
           "call"
@@ -149,33 +149,38 @@
         "Mod+Shift+S".action.move-column-to-monitor-right = [ ];
 
         # Window focus and movement
-        "Mod+K".action.focus-window-up = [ ];
-        "Mod+Shift+K".action.move-window-up = [ ];
-        "Mod+J".action.focus-window-down = [ ];
-        "Mod+Shift+J".action.move-window-down = [ ];
-        "Mod+H".action.focus-column-left = [ ];
-        "Mod+Shift+H".action.move-column-left = [ ];
-        "Mod+L".action.focus-column-right = [ ];
-        "Mod+Shift+L".action.move-column-right = [ ];
-        "Mod+O".action.switch-preset-window-height = [ ];
-        "Mod+Shift+O".action.reset-window-height = [ ];
-        "Mod+I".action.consume-or-expel-window-left = [ ];
-        "Mod+Shift+I".action.consume-or-expel-window-right = [ ];
+        "Mod+Z".action.focus-window-up = [ ];
+        "Mod+Shift+Z".action.move-window-up = [ ];
+        "Mod+X".action.focus-window-down = [ ];
+        "Mod+Shift+X".action.move-window-down = [ ];
+        "Mod+Q".action.focus-column-left = [ ];
+        "Mod+Shift+Q".action.move-column-left = [ ];
+        "Mod+W".action.focus-column-right = [ ];
+        "Mod+Shift+W".action.move-column-right = [ ];
+        "Mod+T".action.switch-preset-window-height = [ ];
+        "Mod+Shift+T".action.reset-window-height = [ ];
+        "Mod+E".action.consume-or-expel-window-left = [ ];
+        "Mod+Shift+E".action.consume-or-expel-window-right = [ ];
         "Mod+WheelScrollDown".action.focus-column-right = [ ];
         "Mod+WheelScrollUp".action.focus-column-left = [ ];
         "Mod+Shift+WheelScrollDown".action.focus-workspace-down = [ ];
         "Mod+Shift+WheelScrollUp".action.focus-workspace-up = [ ];
 
         # Resize mode
-        "Mod+U".action.switch-preset-column-width = [ ];
+        "Mod+R".action.switch-preset-column-width = [ ];
 
         #tabbed
-        "Mod+T".action.toggle-column-tabbed-display = [ ];
+        "Mod+G".action.toggle-column-tabbed-display = [ ];
 
         # Screenshots
         "Print".action.screenshot = [ ];
         "Ctrl+Print".action.screenshot-window = [ ];
         "Shift+Print".action.screenshot-screen = [ ];
+        "Alt+Print".action.spawn = [
+          "sh"
+          "-c"
+          "wl-paste --type image/png | swappy -f -"
+        ];
 
         # Media keys
         "XF86AudioRaiseVolume" = {

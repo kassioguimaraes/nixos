@@ -23,8 +23,8 @@
     icons = {
       enable = true;
       package = pkgs.tela-icon-theme;
-      light = "Tela-green";
-      dark = "Tela-green-dark";
+      light = "Tela-grey";
+      dark = "Tela-grey-dark";
     };
   };
 
