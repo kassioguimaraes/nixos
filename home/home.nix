@@ -23,8 +23,11 @@
     nextcloud-client
     obsidian
     obsidian-export
+    kdePackages.gwenview
+    kdePackages.kate
   ];
 
+  services.easyeffects.enable = true;
   programs.btop = { enable = true; };
   programs.kitty = {
     enable = true;
