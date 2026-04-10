@@ -131,8 +131,9 @@
     nautilus
     nautilus-open-any-terminal
     evince
-    protonvpn-gui
+    proton-vpn
     chromium
+    mpv
   ];
   fonts.packages = with pkgs; [
     noto-fonts

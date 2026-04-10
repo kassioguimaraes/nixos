@@ -4,10 +4,10 @@
 
   home.username = "kassio";
   home.homeDirectory = "/home/kassio";
-  home.stateVersion = "25.11";
+  home.stateVersion = "26.05";
   imports = [
     ./home.nix
-    #      ./gaming.nix
+    ./gaming.nix
   ];
   wayland.windowManager.hyprland = {
     settings.monitor = [
