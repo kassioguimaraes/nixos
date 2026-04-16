@@ -31,7 +31,7 @@
         y = 0;
       };
       scale = 1.0;
-      variable-refresh-rate = true;
+      variable-refresh-rate = false;
     };
     "DP-2" = {
       mode = {
