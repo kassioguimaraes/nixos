@@ -44,7 +44,7 @@
         };
         nixd.enable = true;
         intelephense.enable = true;
-        intelephense.package = pkgs.nodePackages_latest.intelephense;
+        intelephense.package = pkgs.intelephense;
       };
 
     };
