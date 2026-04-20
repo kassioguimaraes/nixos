@@ -1,8 +1,8 @@
 { config, pkgs, ... }:
 
 {
-  home.username = "ksgm";
-  home.homeDirectory = "/home/ksgm";
+  home.username = "kassio";
+  home.homeDirectory = "/home/kassio";
   home.stateVersion = "26.05";
   imports = [ ./home.nix ];
 

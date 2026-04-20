@@ -50,7 +50,7 @@
           inherit system;
           modules = sharedModules ++ [
             ./laptop/configuration-laptop.nix
-            { home-manager.users.ksgm = import ./home/home-laptop.nix; }
+            { home-manager.users.kassio = import ./home/home-laptop.nix; }
           ];
         };
 

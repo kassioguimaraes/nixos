@@ -20,6 +20,7 @@
   #theming
   stylix = {
     image = ../home/assets/wallpapers/gr.jpg;
+    polarity = "dark";
     icons = {
       enable = true;
       package = pkgs.tela-icon-theme;

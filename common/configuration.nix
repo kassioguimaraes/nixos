@@ -6,14 +6,14 @@
   boot.loader.systemd-boot.enable = true;
   boot.initrd.systemd.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.plymouth.enable = true;
+  #boot.plymouth.enable = true;
 
   #security
   services.gnome.gnome-keyring.enable = true;
   services.displayManager.gdm.enable = true;
 
   #environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  programs.hyprland.enable = true;
+  #programs.hyprland.enable = true;
   programs.niri.enable = true;
   programs.niri.package = pkgs.niri-unstable;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
@@ -149,7 +149,6 @@
       package = pkgs.rose-pine-cursor;
       name = "BreezeX-RosePine-Linux";
     };
-    polarity = "dark";
     opacity = {
       terminal = 0.95;
       popups = 0.85;
