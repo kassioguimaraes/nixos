@@ -6,6 +6,9 @@
   ...
 }:
 
+let
+in
+
 {
   programs.niri = {
     settings = {
@@ -107,7 +110,15 @@
         ];
 
         # Window management
-        "Mod+Return".action.spawn = "kitty";
+        "Mod+Return".action.spawn-sh = ''
+          window_id="$(niri msg --json windows 2>/dev/null | jq -r '.[] | select(.app_id == "kitty") | .id' | head -n1 || true)"
+
+          if [ -n "$window_id" ]; then
+            exec niri msg action focus-window --id "$window_id"
+          fi
+
+          exec kitty
+        '';
         "Mod+Shift+C".action.close-window = [ ];
         "Mod+Space".action.toggle-window-floating = [ ];
         "Mod+F".action.maximize-column = [ ];
@@ -368,5 +379,6 @@
     wl-clipboard
     hyprshot
     rose-pine-cursor
+    jq
   ];
 }

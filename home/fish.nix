@@ -7,6 +7,10 @@
       if test -f ~/.aliases
         source ~/.aliases
       end
+
+      if status is-interactive; and not set -q TMUX
+        exec tmux new-session -A -s general -c "$PWD"
+      end
     '';
     shellAliases = {
       sf = "fastfetch";
