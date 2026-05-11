@@ -1,19 +1,31 @@
-{ config, pkgs, ... }: {
-  imports = [ ./hardware-configuration-desktop.nix ../common/gaming.nix ];
+{ config, pkgs, ... }:
+{
+  imports = [
+    ./hardware-configuration-desktop.nix
+    ../common/gaming.nix
+  ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [ "quiet" "splash" "video=HDMI-A-1:d" ];
+  boot.kernelParams = [
+    "quiet"
+    "splash"
+    "video=HDMI-A-1:d"
+  ];
 
   services.xserver.xkb = {
     layout = "br";
     variant = "";
   };
-  #services.desktopManager.plasma6.enable = true;
 
   users.users.kassio = {
     isNormalUser = true;
     description = "Kassio Guimaraes";
-    extraGroups = [ "networkmanager" "wheel" "video" "docker" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "video"
+      "docker"
+    ];
     packages = with pkgs; [ ];
   };
 
@@ -46,6 +58,5 @@
     libvdpau-va-gl
     libva-vdpau-driver
   ];
-
 
 }

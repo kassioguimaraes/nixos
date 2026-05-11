@@ -25,6 +25,7 @@
     obsidian-export
     kdePackages.gwenview
     kdePackages.kate
+    vesktop
   ];
 
   services.easyeffects.enable = true;

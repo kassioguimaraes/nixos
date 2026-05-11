@@ -6,6 +6,7 @@
   home.packages = with pkgs; [
     sshpass
     vscode
+    zed-editor-fhs
     tmux
     tmux-sessionizer
     nodejs_24
