@@ -70,7 +70,7 @@ in
 
       # Startup commands
       spawn-at-startup = [
-        { command = [ "noctalia-shell" ]; }
+        { command = [ "noctalia" ]; }
         { command = [ "nextcloud" ]; }
       ];
 
@@ -81,32 +81,16 @@ in
       binds = {
         # Noctalia shell commands
         "Mod+Escape".action.spawn = [
-          "noctalia-shell"
-          "ipc"
-          "call"
-          "controlCenter"
-          "toggle"
+          "noctalia"
+          "msg"
+          "panel-toggle"
+          "control-center"
         ];
         "Mod+Shift+P".action.spawn = [
-          "noctalia-shell"
-          "ipc"
-          "call"
-          "sessionMenu"
-          "toggle"
-        ];
-        "Mod+Shift+N".action.spawn = [
-          "noctalia-shell"
-          "ipc"
-          "call"
-          "network"
-          "togglePanel"
-        ];
-        "Mod+Shift+B".action.spawn = [
-          "noctalia-shell"
-          "ipc"
-          "call"
-          "bluetooth"
-          "togglePanel"
+          "noctalia"
+          "msg"
+          "panel-toggle"
+          "session"
         ];
 
         # Window management
@@ -133,17 +117,15 @@ in
         "Mod+F".action.maximize-column = [ ];
         "Mod+Shift+F".action.fullscreen-window = [ ];
         "Alt+Q".action.spawn = [
-          "noctalia-shell"
-          "ipc"
-          "call"
+          "noctalia"
+          "msg"
+          "panel-toggle"
           "launcher"
-          "toggle"
         ];
         "Alt+V".action.spawn = [
-          "noctalia-shell"
-          "ipc"
-          "call"
-          "launcher"
+          "noctalia"
+          "msg"
+          "panel-toggle"
           "clipboard"
         ];
         "Mod+Tab".action.toggle-overview = [ ];
