@@ -111,8 +111,13 @@
 
   services.gvfs.enable = true;
   services.tumbler.enable = true;
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # Allow unfree packages and selected insecure packages needed by desktop apps.
+  nixpkgs.config = {
+    allowUnfree = true;
+    permittedInsecurePackages = [
+      "electron-39.8.10"
+    ];
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget

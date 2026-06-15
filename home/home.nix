@@ -6,6 +6,7 @@
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop
+    bisq2
     gitMinimal
     gparted-full
     shotwell

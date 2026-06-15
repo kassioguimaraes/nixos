@@ -1,6 +1,5 @@
 { pkgs, ... }: {
   imports = [
-    ./colorscheme.nix
     ./basemap.nix
     ./barbar.nix
     ./plugins.nix

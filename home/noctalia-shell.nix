@@ -11,7 +11,7 @@
     gpu-screen-recorder
   ];
   services.cliphist.enable = true;
-  programs.noctalia-shell = {
+  programs.noctalia = {
     enable = true;
     settings = {
       appLauncher = {

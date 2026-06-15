@@ -40,19 +40,19 @@
           vibrancy = 0.1696;
         };
       };
-      exec-once = [ "noctalia-shell" "nextcloud" ];
+      exec-once = [ "noctalia" "nextcloud" ];
 
       "$mod" = "SUPER";
       "$alt" = "ALT_L";
       "$terminal" = "kitty";
-      "$menu" = "noctalia-shell ipc call launcher toggle";
-      "$clipboard" = "noctalia-shell ipc call launcher clipboard";
-      "$controlcenter" = "noctalia-shell ipc call controlCenter toggle";
-      "$sessionMenu" = "noctalia-shell ipc call sessionMenu toggle";
-      "$suspend" = "noctalia-shell ipc call sessionMenu lockAndSuspend";
-      "$lock" = "noctalia-shell ipc call sessionMenu lock";
-      "$wifi" = "noctalia-shell ipc call network togglePanel";
-      "$bluetooth" = "noctalia-shell ipc call bluetooth togglePanel";
+      "$menu" = "noctalia ipc call launcher toggle";
+      "$clipboard" = "noctalia ipc call launcher clipboard";
+      "$controlcenter" = "noctalia ipc call controlCenter toggle";
+      "$sessionMenu" = "noctalia ipc call sessionMenu toggle";
+      "$suspend" = "noctalia ipc call sessionMenu lockAndSuspend";
+      "$lock" = "noctalia ipc call sessionMenu lock";
+      "$wifi" = "noctalia ipc call network togglePanel";
+      "$bluetooth" = "noctalia ipc call bluetooth togglePanel";
 
       input = {
         "kb_model" = "pc104";
