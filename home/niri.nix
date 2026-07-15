@@ -379,5 +379,6 @@ in
     hyprshot
     rose-pine-cursor
     jq
+    xdg-desktop-portal-gnome
   ];
 }

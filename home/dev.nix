@@ -4,6 +4,7 @@
 
   imports = [ ./tmux.nix ];
   home.packages = with pkgs; [
+    kamal
     sshpass
     vscode
     zed-editor-fhs

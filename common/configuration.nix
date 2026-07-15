@@ -11,9 +11,10 @@
   #security
   services.gnome.gnome-keyring.enable = true;
   services.displayManager.gdm.enable = true;
+  services.displayManager.sessionPackages = [ pkgs.niri-unstable ];
 
   #environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  #programs.hyprland.enable = true;
+  programs.hyprland.enable = true;
   programs.niri.enable = true;
   programs.niri.package = pkgs.niri-unstable;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
@@ -40,7 +41,10 @@
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Nix settings
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
   nix.settings.auto-optimise-store = true;
   # Enable networking
   networking.networkmanager = {
@@ -85,6 +89,7 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    wireplumber.enable = true;
     # If you want to use JACK applications, uncomment this
     #jack.enable = true;
 

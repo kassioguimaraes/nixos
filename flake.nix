@@ -34,7 +34,6 @@
         home-manager.nixosModules.home-manager
         nixvim.nixosModules.nixvim
         niri.nixosModules.niri
-        
         {
           nixpkgs.config.allowUnfree = true;
           nixpkgs.overlays = [ niri.overlays.niri ];
