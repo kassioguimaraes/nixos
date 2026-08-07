@@ -8,24 +8,17 @@
   boot.loader.efi.canTouchEfiVariables = true;
   #boot.plymouth.enable = true;
 
-  #security
-  services.gnome.gnome-keyring.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.displayManager.sessionPackages = [ pkgs.niri-unstable ];
-
   #environment.sessionVariables.NIXOS_OZONE_WL = "1";
   programs.hyprland.enable = true;
-  programs.niri.enable = true;
-  programs.niri.package = pkgs.niri-unstable;
-  #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
+
+  #plasma
+  services.displayManager.plasma-login-manager.enable = true;
+  services.desktopManager.plasma6.enable = true;
 
   #boot.kernelParams = [ "quiet" "splash" ];
 
   #ld
   programs.nix-ld.enable = true;
-  #power
-  services.power-profiles-daemon.enable = true;
-  services.upower.enable = true;
 
   #graphics
   hardware.graphics = {
@@ -107,17 +100,17 @@
   programs.firefox.enable = true;
 
   #file manager
-  programs.thunar = {
-    enable = true;
-    plugins = with pkgs; [
-      thunar-archive-plugin
-      thunar-volman
-      thunar-media-tags-plugin
-    ];
-  };
+  #programs.thunar = {
+  #  enable = true;
+  #  plugins = with pkgs; [
+  #    thunar-archive-plugin
+  #    thunar-volman
+  #    thunar-media-tags-plugin
+  #  ];
+  #};
 
-  services.gvfs.enable = true;
-  services.tumbler.enable = true;
+  #services.gvfs.enable = true;
+  #services.tumbler.enable = true;
   # Allow unfree packages and selected insecure packages needed by desktop apps.
   nixpkgs.config = {
     allowUnfree = true;

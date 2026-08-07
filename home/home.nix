@@ -2,15 +2,15 @@
 
 {
   imports =
-    [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ./niri.nix ./music.nix ];
+    [ ./dev.nix ./looks.nix ./fish.nix ./music.nix ];
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop
     bisq2
     gitMinimal
-    gparted-full
-    shotwell
-    sxiv
+    #gparted-full
+    #shotwell
+    #sxiv
     gimp3-with-plugins
     vim
     curl
@@ -24,8 +24,8 @@
     nextcloud-client
     obsidian
     obsidian-export
-    kdePackages.gwenview
-    kdePackages.kate
+    #kdePackages.gwenview
+    #kdePackages.kate
     vesktop
   ];
 

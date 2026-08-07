@@ -18,13 +18,9 @@
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    niri = {
-      url = "github:sodiboo/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = inputs@{ self, nixpkgs, stylix, home-manager, nixvim, niri, ... }:
+  outputs = inputs@{ self, nixpkgs, stylix, home-manager, nixvim, ... }:
     let
       system = "x86_64-linux";
       # Shared modules for all hosts
@@ -33,10 +29,8 @@
         stylix.nixosModules.stylix
         home-manager.nixosModules.home-manager
         nixvim.nixosModules.nixvim
-        niri.nixosModules.niri
         {
           nixpkgs.config.allowUnfree = true;
-          nixpkgs.overlays = [ niri.overlays.niri ];
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.sharedModules =
