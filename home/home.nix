@@ -2,7 +2,7 @@
 
 {
   imports =
-    [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ./niri.nix ];
+    [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ./niri.nix ./music.nix ];
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop
