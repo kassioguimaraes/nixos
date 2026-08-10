@@ -5,6 +5,8 @@
   imports = [ ./tmux.nix ];
   home.packages = with pkgs; [
     kamal
+    bruno
+    bruno-cli
     sshpass
     vscode
     zed-editor-fhs
@@ -45,8 +47,8 @@
         selectedLineBgColor = [ "bold" ];
         nerdFontsVersion = 3;
       };
-      git.pagers =
-        [{ pager = "delta --line-numbers --features=colibri --paging=never"; }];
+      git.diffRenderers =
+        [{ command = "delta --line-numbers --features=colibri --paging=never"; }];
     };
   };
 
