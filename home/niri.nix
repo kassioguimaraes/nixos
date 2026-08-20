@@ -6,9 +6,6 @@
   ...
 }:
 
-let
-in
-
 {
   programs.niri = {
     settings = {
@@ -372,6 +369,30 @@ in
       # Output configuration (monitors)
       # Override this in home-desktop.nix or home-laptop.nix for specific setups
       outputs = { };
+    };
+  };
+
+  services.swayidle = {
+    enable = true;
+    timeouts = [
+      {
+        timeout = 120;
+        command = "${lib.getExe pkgs.brightnessctl} -s set 10%";
+        resumeCommand = "${lib.getExe pkgs.brightnessctl} -r";
+      }
+      {
+        timeout = 300;
+        command = "${lib.getExe pkgs.niri-unstable} msg action power-off-monitors";
+        resumeCommand = "${lib.getExe pkgs.niri-unstable} msg action power-on-monitors; ${lib.getExe pkgs.brightnessctl} -r";
+      }
+      {
+        timeout = 900;
+        command = "noctalia msg session lock; ${pkgs.systemd}/bin/systemctl suspend";
+      }
+    ];
+    events = {
+      before-sleep = "noctalia msg session lock";
+      after-resume = "${lib.getExe pkgs.niri-unstable} msg action power-on-monitors; ${lib.getExe pkgs.brightnessctl} -r";
     };
   };
 

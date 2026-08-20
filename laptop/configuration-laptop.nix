@@ -1,5 +1,8 @@
 { config, pkgs, ... }: {
-  imports = [ ./hardware-configuration-laptop.nix ];
+  imports = [
+    ./hardware-configuration-laptop.nix
+    ../common/gaming.nix
+  ];
 
   boot.kernelParams = [ "quiet" "splash" ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
