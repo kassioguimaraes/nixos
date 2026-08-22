@@ -9,6 +9,7 @@
   #boot.plymouth.enable = true;
 
   #security
+  security.polkit.enable = true;
   services.gnome.gnome-keyring.enable = true;
   services.displayManager.gdm.enable = true;
   services.displayManager.sessionPackages = [ pkgs.niri-unstable ];
@@ -146,6 +147,8 @@
     proton-vpn
     chromium
     mpv
+    gparted-full
+    polkit_gnome
   ];
   fonts.packages = with pkgs; [
     noto-fonts

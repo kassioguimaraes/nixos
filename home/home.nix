@@ -8,7 +8,6 @@
     bitwarden-desktop
     bisq2
     gitMinimal
-    gparted-full
     shotwell
     sxiv
     gimp3-with-plugins
