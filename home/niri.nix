@@ -381,12 +381,12 @@
         resumeCommand = "${lib.getExe pkgs.brightnessctl} -r";
       }
       {
-        timeout = 300;
+        timeout = 600;
         command = "${lib.getExe pkgs.niri-unstable} msg action power-off-monitors";
         resumeCommand = "${lib.getExe pkgs.niri-unstable} msg action power-on-monitors; ${lib.getExe pkgs.brightnessctl} -r";
       }
       {
-        timeout = 900;
+        timeout = 1200;
         command = "noctalia msg session lock; ${pkgs.systemd}/bin/systemctl suspend";
       }
     ];
