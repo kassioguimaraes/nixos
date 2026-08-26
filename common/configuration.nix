@@ -3,7 +3,7 @@
 {
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.limine.enable = true;
   boot.initrd.systemd.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   #boot.plymouth.enable = true;
@@ -146,6 +146,7 @@
     evince
     proton-vpn
     chromium
+    sbctl
     mpv
     gparted-full
     polkit_gnome
