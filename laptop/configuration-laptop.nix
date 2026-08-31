@@ -11,10 +11,16 @@
   boot.plymouth.enable = true;
 
   security.pam.services.kassio.enableGnomeKeyring = true;
+  services.gnome.gnome-keyring.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.displayManager.sessionPackages = [ pkgs.niri-unstable ];
   services.displayManager.autoLogin = {
     enable = true;
     user = "kassio";
   };
+  programs.hyprland.enable = true;
+  programs.niri.enable = true;
+  programs.niri.package = pkgs.niri-unstable;
   networking.hostName = "workpc";
   networking.wireless.enable = true;
 

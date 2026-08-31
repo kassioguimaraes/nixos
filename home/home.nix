@@ -1,8 +1,12 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ ./hyprland.nix ./dev.nix ./looks.nix ./noctalia-shell.nix ./fish.nix ./niri.nix ./music.nix ];
+  imports = [
+    ./dev.nix
+    ./looks.nix
+    ./fish.nix
+    ./music.nix
+  ];
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop

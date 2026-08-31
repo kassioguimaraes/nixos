@@ -6,11 +6,15 @@
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.initrd.luks.devices."luks-b2a5dc40-ccd0-420f-b2a6-fac62e8186fe".device = "/dev/disk/by-uuid/b2a5dc40-ccd0-420f-b2a6-fac62e8186fe";
   boot.kernelParams = [
     "quiet"
     "splash"
-    "video=HDMI-A-1:d"
   ];
+
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+  services.desktopManager.plasma6.enable = true;
 
   services.xserver.xkb = {
     layout = "br";

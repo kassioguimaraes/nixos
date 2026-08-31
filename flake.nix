@@ -34,14 +34,11 @@
         stylix.nixosModules.stylix
         home-manager.nixosModules.home-manager
         nixvim.nixosModules.nixvim
-        niri.nixosModules.niri
         {
           nixpkgs.config.allowUnfree = true;
-          nixpkgs.overlays = [ niri.overlays.niri ];
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.sharedModules =
-            [ nixvim.homeModules.nixvim inputs.noctalia.homeModules.default ];
+          home-manager.sharedModules = [ nixvim.homeModules.nixvim ];
         }
       ];
     in {
@@ -49,6 +46,11 @@
         laptop = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = sharedModules ++ [
+            niri.nixosModules.niri
+            {
+              nixpkgs.overlays = [ niri.overlays.niri ];
+              home-manager.sharedModules = [ inputs.noctalia.homeModules.default ];
+            }
             ./laptop/configuration-laptop.nix
             { home-manager.users.kassio = import ./home/home-laptop.nix; }
           ];
