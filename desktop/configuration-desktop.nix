@@ -6,6 +6,7 @@
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelModules = [ "ntsync" ];
   boot.initrd.luks.devices."luks-b2a5dc40-ccd0-420f-b2a6-fac62e8186fe".device =
     "/dev/disk/by-uuid/b2a5dc40-ccd0-420f-b2a6-fac62e8186fe";
 
