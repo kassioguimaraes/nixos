@@ -4,11 +4,8 @@
     ../common/gaming.nix
   ];
 
-  boot.kernelParams = [ "quiet" "splash" ];
-  boot.loader.limine.secureBoot.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.initrd.luks.devices."luks-eeb10580-8745-4323-a1a3-8008d9881ed2".device = "/dev/disk/by-uuid/eeb10580-8745-4323-a1a3-8008d9881ed2";
-  boot.plymouth.enable = true;
 
   security.pam.services.kassio.enableGnomeKeyring = true;
   services.gnome.gnome-keyring.enable = true;

@@ -5,8 +5,10 @@
   # Bootloader.
   boot.loader.limine.enable = true;
   boot.initrd.systemd.enable = true;
+  boot.loader.limine.secureBoot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  #boot.plymouth.enable = true;
+  boot.plymouth.enable = true;
+  boot.kernelParams = [ "quiet" "splash" ];
 
   #security
   security.polkit.enable = true;
@@ -19,8 +21,6 @@
   # programs.niri.enable = true;
   # programs.niri.package = pkgs.niri-unstable;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
-
-  #boot.kernelParams = [ "quiet" "splash" ];
 
   #ld
   programs.nix-ld.enable = true;

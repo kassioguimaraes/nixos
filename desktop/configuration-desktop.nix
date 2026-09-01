@@ -6,13 +6,29 @@
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.initrd.luks.devices."luks-b2a5dc40-ccd0-420f-b2a6-fac62e8186fe".device = "/dev/disk/by-uuid/b2a5dc40-ccd0-420f-b2a6-fac62e8186fe";
-  boot.kernelParams = [
-    "quiet"
-    "splash"
-  ];
+  boot.initrd.luks.devices."luks-b2a5dc40-ccd0-420f-b2a6-fac62e8186fe".device =
+    "/dev/disk/by-uuid/b2a5dc40-ccd0-420f-b2a6-fac62e8186fe";
 
-  services.displayManager.sddm.enable = true;
+  environment.etc."crypttab".text = ''
+    steam-games /dev/disk/by-partlabel/steam /root/.secrets/steam.key luks
+  '';
+
+  fileSystems."/home/kassio/games" = {
+    device = "/dev/mapper/steam-games";
+    fsType = "ext4";
+    options = [
+      "nofail"
+      "x-systemd.device-timeout=10s"
+    ];
+  };
+
+  services.displayManager.sddm = {
+    enable = true;
+    autoLogin = {
+      enable = true;
+      user = "kassio";
+    };
+  };
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
 
