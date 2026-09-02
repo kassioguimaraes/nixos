@@ -18,6 +18,7 @@ let
       # TV_OUTPUT=HDMI-A-1 TV_AUDIO_MATCH='LG TV' display-mode tv
       tv_output="''${TV_OUTPUT:-}"
       desktop_outputs="''${DESKTOP_OUTPUTS:-}"
+      main_output="''${MAIN_OUTPUT:-DP-1}"
       tv_audio_match="''${TV_AUDIO_MATCH:-HDMI}"
       desktop_audio_match="''${DESKTOP_AUDIO_MATCH:-KT USB Audio}"
       tv_mode_match="''${TV_MODE_MATCH:-2560x1440}"
@@ -132,17 +133,18 @@ let
       }
 
       desktop_mode() {
-        local tv desktops output first=""
+        local tv desktops output
         tv="$(detect_tv)"
         desktops="$(detect_desktops "$tv")"
         [[ -n "$desktops" ]] || die "no desktop displays were detected"
+        printf '%s\n' "$desktops" | grep -Fxq "$main_output" ||
+          die "main output $main_output is not one of the desktop displays"
 
         while IFS= read -r output; do
           [[ -z "$output" ]] && continue
           kscreen-doctor "output.$output.enable"
-          [[ -z "$first" ]] && first="$output"
         done <<< "$desktops"
-        kscreen-doctor "output.$first.primary" "output.$tv.disable"
+        kscreen-doctor "output.$main_output.primary" "output.$tv.disable"
         set_audio "$desktop_audio_match"
         stop_gamepad_ui
         echo "Desktop mode enabled on $(printf '%s' "$desktops" | tr '\n' ' ')"
@@ -176,15 +178,61 @@ let
       esac
     '';
   };
+  gamepadTvWatcher = pkgs.writeShellApplication {
+    name = "gamepad-tv-watcher";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      set -euo pipefail
+
+      gamepad="''${GAMEPAD_DEVICE:-/dev/input/by-id/usb-8BitDo_8BitDo_Pro_3_Receiver-event-joystick}"
+      was_connected=false
+
+      echo "Watching for gamepad: $gamepad"
+      while true; do
+        if [[ -e "$gamepad" ]]; then
+          if [[ "$was_connected" == false ]]; then
+            was_connected=true
+            echo "Gamepad connected; enabling TV mode"
+            if ! ${lib.getExe displayMode} tv; then
+              echo "Could not enable TV mode; will retry on the next connection" >&2
+            fi
+          fi
+        else
+          if [[ "$was_connected" == true ]]; then
+            echo "Gamepad disconnected; leaving the current display mode unchanged"
+          fi
+          was_connected=false
+        fi
+        sleep 1
+      done
+    '';
+  };
 in {
-  home.packages = [ displayMode ];
+  home.packages = [
+    displayMode
+    gamepadTvWatcher
+  ];
+
+  systemd.user.services.gamepad-tv-watcher = {
+    Unit = {
+      Description = "Enable TV gaming mode when the 8BitDo controller connects";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = lib.getExe gamepadTvWatcher;
+      Restart = "always";
+      RestartSec = 2;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
   # Gamescope/Steam is owned by a user service so desktop mode can reliably
   # close only the instance that TV mode launched.
   systemd.user.services.tv-gamepad-ui = {
     Unit.Description = "Steam Gamepad UI on the TV";
     Service = {
-      ExecStart = "${lib.getExe pkgs.gamescope} -f -e -- ${lib.getExe pkgs.steam} -gamepadui";
+      ExecStart = "${lib.getExe pkgs.gamescope} -f -e --hide-cursor-delay 3000 -- ${lib.getExe pkgs.steam} -gamepadui";
       Restart = "on-failure";
       RestartSec = 2;
     };
