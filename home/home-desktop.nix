@@ -1,14 +1,16 @@
-{ config, pkgs, ... }:
+{ ... }:
 
 {
-
   home.username = "kassio";
   home.homeDirectory = "/home/kassio";
   home.stateVersion = "26.05";
+
   imports = [
     ./home.nix
-    ./gaming.nix
+    ./gaming
+    ./gaming/display-mode.nix
   ];
+
   # Stylix's qtct/Kvantum integration is incompatible with Plasma 6's
   # Qt Quick controls. Let Plasma use its native Qt styling instead.
   stylix.targets.qt.enable = false;

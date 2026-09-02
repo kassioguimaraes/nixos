@@ -23,8 +23,8 @@
     ];
   };
 
-  services.displayManager.sddm = {
-    enable = true;
+  services.displayManager = {
+    sddm.enable = true;
     autoLogin = {
       enable = true;
       user = "kassio";
@@ -79,5 +79,7 @@
     libvdpau-va-gl
     libva-vdpau-driver
   ];
+
+  programs.anime-game-launcher.enable = true;
 
 }

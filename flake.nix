@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    aagl = {
+      url = "github:ezKEa/aagl-gtk-on-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -25,12 +30,13 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, stylix, home-manager, nixvim, niri, ... }:
+  outputs = inputs@{ self, nixpkgs, aagl, stylix, home-manager, nixvim, niri, ... }:
     let
       system = "x86_64-linux";
       # Shared modules for all hosts
       sharedModules = [
         ./common/configuration.nix
+        aagl.nixosModules.default
         stylix.nixosModules.stylix
         home-manager.nixosModules.home-manager
         nixvim.nixosModules.nixvim
@@ -39,6 +45,8 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.sharedModules = [ nixvim.homeModules.nixvim ];
+          programs.anime-game-launcher.package =
+            aagl.packages.${system}.anime-game-launcher;
         }
       ];
     in {
