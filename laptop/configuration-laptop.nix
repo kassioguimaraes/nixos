@@ -35,6 +35,15 @@
     packages = with pkgs; [ ffmpegthumbnailer poppler webp-pixbuf-loader ];
   };
 
+  environment.systemPackages = with pkgs; [
+    networkmanagerapplet
+    file-roller
+    nautilus
+    nautilus-open-any-terminal
+    evince
+    polkit_gnome
+  ];
+
   stylix = {
     enable = true;
     image = ../home/assets/wallpapers/wall2.jpg;
