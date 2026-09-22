@@ -95,6 +95,11 @@ bind-key -n M-l resize-pane -R 5
 bind-key -T prefix C-l select-pane -R
 bind-key -n M-j select-pane -t :.+
 bind-key -n M-k select-pane -t :.-
+# Switch to the adjacent tmux window without wrapping at either end.
+bind-key -n M-q if-shell -F '#{==:#{window_index},1}' 'run-shell true' 'select-window -t :-'
+bind-key -n M-e if-shell -F '#{==:#{window_index},#{session_windows}}' 'run-shell true' 'select-window -t :+'
+# Show the session chooser (equivalent to the default prefix + s binding).
+bind-key -n M-w choose-tree -Zs
 # Swap current pane with the first pane in the next window
 bind-key -n C-i swap-pane -s "$TMUX_PANE" -t 0
 # Close the current pane, except for pane 0

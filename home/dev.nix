@@ -5,6 +5,8 @@
   imports = [ ./tmux.nix ];
   home.packages = with pkgs; [
     kamal
+    kompose
+    k3d
     bruno
     bruno-cli
     sshpass
