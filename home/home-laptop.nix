@@ -6,12 +6,30 @@
   home.stateVersion = "26.05";
   imports = [
     ./home.nix
-    ./hyprland.nix
-    ./noctalia-shell.nix
-    ./niri.nix
   ];
 
-  wayland.windowManager.hyprland = {
-    settings.monitor = "eDP-1, 1920x1080@60,0x0, 1.25";
+  home.packages = with pkgs; [
+    gnomeExtensions.appindicator
+    gnomeExtensions.clipboard-indicator
+    gnomeExtensions.dash-to-dock
+  ];
+
+  dconf.settings = {
+    "org/gnome/shell" = {
+      enabled-extensions = [
+        "appindicatorsupport@rgcjonas.gmail.com"
+        "clipboard-indicator@tudmotu.com"
+        "dash-to-dock@micxgx.gmail.com"
+      ];
+    };
+
+    "org/gnome/shell/extensions/clipboard-indicator" = {
+      toggle-menu = [ "<Alt>v" ];
+    };
+
+    "org/gnome/desktop/wm/keybindings" = {
+      close = [ "<Alt>F4" "<Super><Shift>c" ];
+      toggle-maximized = [ "<Super>f" ];
+    };
   };
 }

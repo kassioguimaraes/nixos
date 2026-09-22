@@ -10,14 +10,11 @@
   security.pam.services.kassio.enableGnomeKeyring = true;
   services.gnome.gnome-keyring.enable = true;
   services.displayManager.gdm.enable = true;
-  services.displayManager.sessionPackages = [ pkgs.niri-unstable ];
+  services.desktopManager.gnome.enable = true;
   services.displayManager.autoLogin = {
     enable = true;
     user = "kassio";
   };
-  programs.hyprland.enable = true;
-  programs.niri.enable = true;
-  programs.niri.package = pkgs.niri-unstable;
   networking.hostName = "workpc";
   networking.wireless.enable = true;
 
@@ -34,15 +31,6 @@
     extraGroups = [ "networkmanager" "wheel" "docker" "video" ];
     packages = with pkgs; [ ffmpegthumbnailer poppler webp-pixbuf-loader ];
   };
-
-  environment.systemPackages = with pkgs; [
-    networkmanagerapplet
-    file-roller
-    nautilus
-    nautilus-open-any-terminal
-    evince
-    polkit_gnome
-  ];
 
   stylix = {
     enable = true;

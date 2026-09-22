@@ -168,13 +168,8 @@
 
   stylix = {
     enable = true;
-    cursor = {
-      size = 24;
-      package = pkgs.rose-pine-cursor;
-      name = "BreezeX-RosePine-Linux";
-    };
     opacity = {
-      terminal = 0.95;
+      terminal = 0.97;
       popups = 0.85;
       desktop = 0.85;
     };
