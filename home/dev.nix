@@ -5,11 +5,14 @@
   imports = [ ./tmux.nix ];
   home.packages = with pkgs; [
     kamal
-    kompose
-    k3d
+    opencode-desktop
+    opencode
     bruno
     bruno-cli
+    laravel
     sshpass
+    gnumake
+    openapi-generator-cli
     vscode
     zed-editor-fhs
     tmux

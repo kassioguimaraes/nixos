@@ -5,6 +5,7 @@
     protonup-qt
     antimicrox
     pulseaudio
+    thcrap-steam-proton-wrapper
   ];
 
   home.file."antimicro.amgp".source = ./antimicro.amgp;
