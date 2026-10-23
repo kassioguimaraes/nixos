@@ -1,8 +1,40 @@
 { config, pkgs, ... }:
 
+let
+  mattPocockSkillsSource = pkgs.fetchzip {
+    url = "https://github.com/mattpocock/skills/archive/3cca18b368ae95cdbdebbff572ccafa662551015.tar.gz";
+    hash = "sha256-dF5i37jHnqfcXD1IRSVzSSm/pfCYSUmOsEhhs5Zx340=";
+  };
+
+  # Flatten the upstream categories into the layout agents expect:
+  # <skills-directory>/<skill-name>/SKILL.md
+  mattPocockSkills = pkgs.runCommand "matt-pocock-skills" { } ''
+    mkdir -p "$out"
+
+    for category in engineering productivity in-progress; do
+      for skill in "${mattPocockSkillsSource}/skills/$category"/*; do
+        if [ -f "$skill/SKILL.md" ]; then
+          cp -R "$skill" "$out/"
+        fi
+      done
+    done
+  '';
+in
 {
 
   imports = [ ./tmux.nix ];
+
+  # Install the same pinned skills for both coding agents. Recursive Home
+  # Manager links let these coexist with skills managed by either tool.
+  home.file.".codex/skills" = {
+    source = mattPocockSkills;
+    recursive = true;
+  };
+  xdg.configFile."opencode/skills" = {
+    source = mattPocockSkills;
+    recursive = true;
+  };
+
   home.packages = with pkgs; [
     kamal
     opencode-desktop

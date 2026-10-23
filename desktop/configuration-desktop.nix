@@ -33,6 +33,14 @@
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  # Keep the DualShock 4 touchpad from controlling the Plasma cursor while
+  # preserving the controller itself for games.
+  services.udev.extraRules = ''
+    SUBSYSTEM=="input", KERNEL=="event*", \
+      ATTRS{name}=="Sony Interactive Entertainment Wireless Controller Touchpad", \
+      ENV{LIBINPUT_IGNORE_DEVICE}="1"
+  '';
+
   services.xserver.xkb = {
     layout = "br";
     variant = "";

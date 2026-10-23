@@ -8,6 +8,7 @@ let
       gnugrep
       gnused
       kdePackages.libkscreen
+      procps
       systemd
       wireplumber
     ];
@@ -112,8 +113,25 @@ let
         systemctl --user stop "$game_unit" 2>/dev/null || true
       }
 
+      stop_steam() {
+        # Steam reuses an existing client, so starting it with -gamepadui while
+        # the desktop client is running does not reliably create the Gamescope
+        # session managed by tv-gamepad-ui.service.
+        stop_gamepad_ui
+        if pgrep -x steam >/dev/null; then
+          echo "Stopping the existing Steam client"
+          pkill -x steam || true
+          for _ in {1..50}; do
+            pgrep -x steam >/dev/null || return
+            sleep 0.1
+          done
+          die "Steam did not exit after 5 seconds"
+        fi
+      }
+
       tv_mode() {
         local tv desktops output tv_mode_id
+        stop_steam
         tv="$(detect_tv)"
         desktops="$(detect_desktops "$tv")"
         tv_mode_id="$(mode_id "$tv" "$tv_mode_match")"
@@ -134,6 +152,7 @@ let
 
       desktop_mode() {
         local tv desktops output
+        stop_gamepad_ui
         tv="$(detect_tv)"
         desktops="$(detect_desktops "$tv")"
         [[ -n "$desktops" ]] || die "no desktop displays were detected"
@@ -146,7 +165,6 @@ let
         done <<< "$desktops"
         kscreen-doctor "output.$main_output.primary" "output.$tv.disable"
         set_audio "$desktop_audio_match"
-        stop_gamepad_ui
         echo "Desktop mode enabled on $(printf '%s' "$desktops" | tr '\n' ' ')"
       }
 
@@ -178,6 +196,27 @@ let
       esac
     '';
   };
+  desktopModeOnLogin = pkgs.writeShellApplication {
+    name = "desktop-mode-on-login";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      set -u
+
+      # KScreen and PipeWire can take a moment to become available after the
+      # graphical session target starts. Keep trying rather than leaving the
+      # display layout Plasma restored from the previous session.
+      for attempt in {1..30}; do
+        if ${lib.getExe displayMode} desktop; then
+          exit 0
+        fi
+        echo "Desktop mode is not ready (attempt $attempt/30); retrying" >&2
+        sleep 1
+      done
+
+      echo "Could not restore desktop mode after 30 attempts" >&2
+      exit 1
+    '';
+  };
   gamepadTvWatcher = pkgs.writeShellApplication {
     name = "gamepad-tv-watcher";
     runtimeInputs = [ pkgs.coreutils ];
@@ -185,7 +224,12 @@ let
       set -euo pipefail
 
       gamepad="''${GAMEPAD_DEVICE:-/dev/input/by-id/usb-8BitDo_8BitDo_Pro_3_Receiver-event-joystick}"
-      was_connected=false
+      if [[ -e "$gamepad" ]]; then
+        was_connected=true
+        echo "Gamepad is already connected; keeping the boot display mode unchanged"
+      else
+        was_connected=false
+      fi
 
       echo "Watching for gamepad: $gamepad"
       while true; do
@@ -210,13 +254,32 @@ let
 in {
   home.packages = [
     displayMode
+    desktopModeOnLogin
     gamepadTvWatcher
   ];
+
+  systemd.user.services.desktop-mode-on-login = {
+    Unit = {
+      Description = "Restore desktop displays at graphical login";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+      Before = [ "gamepad-tv-watcher.service" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = lib.getExe desktopModeOnLogin;
+      RemainAfterExit = true;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
   systemd.user.services.gamepad-tv-watcher = {
     Unit = {
       Description = "Enable TV gaming mode when the 8BitDo controller connects";
-      After = [ "graphical-session.target" ];
+      After = [
+        "graphical-session.target"
+        "desktop-mode-on-login.service"
+      ];
       PartOf = [ "graphical-session.target" ];
     };
     Service = {

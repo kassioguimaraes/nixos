@@ -22,6 +22,11 @@
   # programs.niri.package = pkgs.niri-unstable;
   #environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal"];
 
+  #appimage
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
   #ld
   programs.nix-ld.enable = true;
   #power
@@ -114,6 +119,12 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  # Make Neovim available system-wide and use it wherever an editor is needed.
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+  };
 
   #file manager
   # programs.thunar = {

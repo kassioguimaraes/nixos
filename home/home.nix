@@ -41,6 +41,7 @@
       hide_window_decorations = "yes";
       term = "xterm-256color";
       confirm_os_window_close = "0";
+      enable_audio_bell = "no";
     };
   };
   programs.rofi.enable = true;
