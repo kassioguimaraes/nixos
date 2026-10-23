@@ -124,29 +124,6 @@
     #   enable = true;
     #   settings.mapping = [ "qq" ];
     # };
-    copilot-lua = {
-      enable = true;
-      settings = {
-        filetypes = {
-          "*" = true;
-          "md" = false;
-        };
-        suggestion.enabled = false;
-        panel.enabled = false;
-      };
-    };
-    copilot-chat = {
-      enable = true;
-      settings = {
-        window = {
-          layout = "float";
-          relative = "cursor";
-          width = 1;
-          height = 0.7;
-          row = 1;
-        };
-      };
-    };
     mini = {
       enable = true;
       modules = {

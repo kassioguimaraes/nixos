@@ -8,7 +8,10 @@
     opencode-desktop
     opencode
     bruno
+    claude-code
+    claude-monitor
     bruno-cli
+    sqlx-cli
     laravel
     sshpass
     gnumake

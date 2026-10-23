@@ -15,10 +15,6 @@
         desc = "Command";
       }
       {
-        __unkeyed-1 = "<leader>c";
-        desc = "Copilot";
-      }
-      {
         __unkeyed-1 = "<leader>q";
         desc = "Quit";
       }
@@ -183,10 +179,6 @@
         desc = "Review this code";
       }
       {
-        __unkeyed-1 = "<leader>cw";
-        desc = "Show Copilot Window";
-      }
-      {
         __unkeyed-1 = "<leader>of";
         desc = "Org files";
       }
@@ -346,47 +338,6 @@
       action = "<cmd>q<CR>";
       key = "<leader>wq";
       mode = [ "n" ];
-    }
-    #copilot chat
-    {
-      action = ":CopilotChat ";
-      key = "<leader>cc";
-      mode = [ "n" "v" ];
-    }
-    {
-      action = "<cmd>CopilotChatTests<CR>";
-      key = "<leader>ct";
-      mode = [ "n" "v" ];
-    }
-    {
-      action = "<cmd>CopilotChatFix<CR>";
-      key = "<leader>cf";
-      mode = [ "n" "v" ];
-    }
-    {
-      action = "<cmd>CopilotChatExplain<CR>";
-      key = "<leader>ce";
-      mode = [ "n" "v" ];
-    }
-    {
-      action = "<cmd>CopilotChatReview<CR>";
-      key = "<leader>cr";
-      mode = [ "n" "v" ];
-    }
-    {
-      action = "<cmd>CopilotChatOptimize<CR>";
-      key = "<leader>ci";
-      mode = [ "n" "v" ];
-    }
-    {
-      action = "<cmd>CopilotChatDocs<CR>";
-      key = "<leader>cd";
-      mode = [ "n" "v" ];
-    }
-    {
-      action = "<cmd>CopilotChatToggle<CR>";
-      key = "<leader>cw";
-      mode = [ "n" "v" ];
     }
         #orgmode
     {

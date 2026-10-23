@@ -40,7 +40,10 @@
         pyright.enable = true;
         html = {
           enable = true;
-          filetypes = [ "html" "blade" ];
+          filetypes = [
+            "html"
+            "blade"
+          ];
         };
         nixd.enable = true;
         intelephense.enable = true;
@@ -54,18 +57,15 @@
     };
     lsp-signature.enable = true;
     lsp-status.enable = true;
-    blink-cmp-copilot.enable = true;
     blink-cmp = {
       enable = true;
       settings = {
         sources = {
-          providers.copilot = {
-            async = true;
-            module = "blink-cmp-copilot";
-            name = "copilot";
-            score_offset = 100;
-          };
-          default = [ "lsp" "snippets" "buffer" "copilot" ];
+          default = [
+            "lsp"
+            "snippets"
+            "buffer"
+          ];
           cmdline = [ ];
         };
         # disabled for now
@@ -78,16 +78,35 @@
         signature.enabled = true;
         keymap = {
           preset = "none";
-          "<Tab>" = [ "select_next" "fallback" ];
-          "<S-Tab>" = [ "select_prev" "fallback" ];
-          "<CR>" = [ "accept" "fallback" ];
-          "<C-d>" = [ "show" "show_documentation" "hide_documentation" ];
+          "<Tab>" = [
+            "select_next"
+            "fallback"
+          ];
+          "<S-Tab>" = [
+            "select_prev"
+            "fallback"
+          ];
+          "<CR>" = [
+            "accept"
+            "fallback"
+          ];
+          "<C-d>" = [
+            "show"
+            "show_documentation"
+            "hide_documentation"
+          ];
           "<C-e>" = [ "hide" ];
-          "<C-j>" = [ "scroll_documentation_down" "fallback" ];
-          "<C-k>" = [ "scroll_documentation_up" "fallback" ];
+          "<C-j>" = [
+            "scroll_documentation_down"
+            "fallback"
+          ];
+          "<C-k>" = [
+            "scroll_documentation_up"
+            "fallback"
+          ];
         };
-
       };
+
     };
     luasnip.enable = true;
     #lsp-format.enable = true;
