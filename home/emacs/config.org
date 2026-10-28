@@ -1,0 +1,447 @@
+#+TITLE: Emacs Configuration
+#+PROPERTY: header-args:emacs-lisp :tangle yes
+
+#+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
+#+end_src
+
+* Evil
+** Evil mode
+=evil-want-keybinding= must be nil before evil loads, or evil-collection will complain.
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-integration t
+          evil-want-keybinding nil
+          evil-search-module 'evil-search
+          evil-want-C-u-scroll t
+          evil-undo-system 'undo-redo
+          evil-shift-width 4
+          evil-ex-search-case 'smart)
+    :config
+    (evil-mode 1))
+#+end_src
+
+** Evil collection
+Vim bindings for the rest of Emacs (dired, magit, help buffers, ...).
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+#+end_src
+
+* Editing
+Ports of the nixvim editing plugins and options.
+
+** Indentation
+4 spaces, no tabs (=tabstop=, =shiftwidth=, =expandtab=).
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil
+                tab-width 4)
+#+end_src
+
+** Escape with jk / kj
+Replaces easyescape. Both orders work, typed quickly.
+#+begin_src emacs-lisp
+  (use-package evil-escape
+    :after evil
+    :custom
+    (evil-escape-key-sequence "jk")
+    (evil-escape-unordered-key-sequence t)
+    (evil-escape-delay 0.1)
+    :config
+    (evil-escape-mode 1))
+#+end_src
+
+** Surround
+=ys=, =cs=, =ds=, and =S= in visual state, like vim-surround.
+#+begin_src emacs-lisp
+  (use-package evil-surround
+    :after evil
+    :config
+    (global-evil-surround-mode 1))
+#+end_src
+
+** Comment
+=gc= operator and =gcc= for the current line, like comment.nvim.
+#+begin_src emacs-lisp
+  (use-package evil-commentary
+    :after evil
+    :config
+    (evil-commentary-mode 1))
+#+end_src
+
+** Jump (flash)
+=s= then type a few characters: avy labels every match on screen, press the
+label to jump. Normal and visual state only: in operator state =s= belongs to
+surround (=ys=, =cs=, =ds=).
+#+begin_src emacs-lisp
+  (use-package avy
+    :demand t
+    :custom
+    (avy-timeout-seconds 0.3))
+#+end_src
+
+** Matching pairs (matchup)
+=%= jumps between matching tags and keywords, not only brackets.
+#+begin_src emacs-lisp
+  (use-package evil-matchit
+    :after evil
+    :config
+    (global-evil-matchit-mode 1))
+#+end_src
+
+** Remember last position (lastplace)
+#+begin_src emacs-lisp
+  (save-place-mode 1)
+#+end_src
+
+** Resize mode (smart-splits)
+=SPC w r=, then =h= / =j= / =k= / =l= keep resizing until any other key.
+#+begin_src emacs-lisp
+  (defvar-keymap my/window-resize-map
+    :repeat t
+    "h" #'shrink-window-horizontally
+    "l" #'enlarge-window-horizontally
+    "j" #'enlarge-window
+    "k" #'shrink-window)
+
+  (defun my/window-resize ()
+    "Start resizing the window; h/j/k/l repeat."
+    (interactive)
+    (set-transient-map my/window-resize-map t)
+    (message "Resize: h/j/k/l, any other key to stop"))
+#+end_src
+
+* Finding things
+The Telescope replacement: vertico draws the list, orderless does the fuzzy
+matching, marginalia adds annotations and consult provides the pickers with
+live preview.
+
+** Vertico
+=M-j= / =M-k= move through results, like the Telescope mappings.
+#+begin_src emacs-lisp
+  (use-package vertico
+    :custom
+    (vertico-cycle t)
+    :bind (:map vertico-map
+                ("M-j" . vertico-next)
+                ("M-k" . vertico-previous))
+    :config
+    (vertico-mode 1))
+
+  ;; Remember minibuffer history, so recent picks come first
+  (savehist-mode 1)
+#+end_src
+
+** Orderless
+Space-separated terms, matched in any order. Files keep =partial-completion=
+so =~/c/n/h= expands to =~/code/nixos/home=.
+#+begin_src emacs-lisp
+  (use-package orderless
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles partial-completion)))))
+#+end_src
+
+** Marginalia
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :config
+    (marginalia-mode 1))
+#+end_src
+
+** Consult
+=F1= lists the project's (git) files, falling back to every file under the
+current directory outside a project.
+#+begin_src emacs-lisp
+  (use-package consult
+    :commands (consult-fd consult-ripgrep consult-buffer consult-line consult-imenu))
+
+  (defun my/find-project-files ()
+    "Find files in the current project, or under `default-directory'."
+    (interactive)
+    (if (project-current)
+        (project-find-file)
+      (consult-fd default-directory)))
+#+end_src
+
+** Projects
+=SPC f p= switches between projects. Every git repo directly under =~/code= is
+picked up on each switch, so new clones show up without visiting them first.
+#+begin_src emacs-lisp
+  (defun my/switch-project ()
+    "Switch project, after registering the repos under ~/code."
+    (interactive)
+    (let ((inhibit-message t))
+      (project-remember-projects-under "~/code/"))
+    (call-interactively #'project-switch-project))
+#+end_src
+
+* Keybindings
+** Which-key
+Shows the available keys after a prefix (like =SPC=). Built into Emacs 30+.
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure nil
+    :custom
+    (which-key-idle-delay 0.3)
+    :config
+    (which-key-mode 1))
+#+end_src
+
+** General
+Leader key definer: =SPC= in normal/visual/motion state, =M-SPC= everywhere
+else (insert state, terminals, ...). The =override= keymap makes the leader
+win over mode maps such as dired and magit.
+#+begin_src emacs-lisp
+  (use-package general
+    :after evil
+    :config
+    (general-create-definer my/leader
+      :states '(normal visual motion insert emacs)
+      :keymaps 'override
+      :prefix "SPC"
+      :non-normal-prefix "M-SPC"))
+#+end_src
+
+** Leader bindings
+Mirrors the nixvim which-key layout. Eglot's commands aren't autoloaded, so
+declare the ones bound below.
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure nil
+    :commands (eglot-rename eglot-code-actions))
+
+  (my/leader
+    "x" '(execute-extended-command :which-key "Command")
+    "q" '(save-buffers-kill-terminal :which-key "Quit")
+    "s" '(consult-line :which-key "Search buffer")
+    "." '(ghostel :which-key "Terminal")
+
+    "f"  '(:ignore t :which-key "Files")
+    "fF" '(consult-fd :which-key "Find files")
+    "fe" '(dired-jump :which-key "Explorer")
+    "fs" '(save-buffer :which-key "Save file")
+    "fd" '(kill-current-buffer :which-key "Close file")
+    "fu" '(vundo :which-key "Undo tree")
+    "fg" '(consult-ripgrep :which-key "Grep files")
+    "fb" '(consult-buffer :which-key "Switch buffer")
+    "fp" '(my/switch-project :which-key "Switch project")
+    "fP" '((lambda () (interactive) (dired "~/code/")) :which-key "Browse ~/code")
+
+    "g"  '(:ignore t :which-key "Lsp")
+    "gd" '(xref-find-definitions :which-key "Go to definition")
+    "gh" '(eldoc :which-key "Show documentation")
+    "go" '(consult-imenu :which-key "Outline")
+    "gr" '(eglot-rename :which-key "Rename symbol")
+    "ga" '(eglot-code-actions :which-key "Code actions")
+    "ge" '(flymake-show-buffer-diagnostics :which-key "File errors")
+    "gE" '(flymake-show-project-diagnostics :which-key "Project errors")
+    "gn" '(flymake-goto-next-error :which-key "Next error")
+    "gN" '(flymake-goto-prev-error :which-key "Previous error")
+
+    "w"  '(:ignore t :which-key "Window")
+    "ws" '(split-window-right :which-key "Split vertically")
+    "wv" '(split-window-below :which-key "Split horizontally")
+    "wh" '(windmove-left :which-key "Move left")
+    "wj" '(windmove-down :which-key "Move down")
+    "wk" '(windmove-up :which-key "Move up")
+    "wl" '(windmove-right :which-key "Move right")
+    "wH" '(shrink-window-horizontally :which-key "Decrease width")
+    "wL" '(enlarge-window-horizontally :which-key "Increase width")
+    "wJ" '(shrink-window :which-key "Decrease height")
+    "wK" '(enlarge-window :which-key "Increase height")
+    "wr" '(my/window-resize :which-key "Resize mode")
+    "wi" '(window-swap-states :which-key "Swap window")
+    "wf" '(delete-other-windows :which-key "Close other windows")
+    "wd" '(delete-window :which-key "Close pane")
+
+    "o"  '(:ignore t :which-key "Org mode")
+    "of" '((lambda () (interactive) (find-file "~/org/")) :which-key "Org files")
+
+    "c"  '(:ignore t :which-key "Claude")
+    "cc" '(claude-code-ide :which-key "Start session")
+    "cm" '(claude-code-ide-menu :which-key "Menu")
+    "cp" '(claude-code-ide-send-prompt :which-key "Send prompt")
+    "ca" '(claude-code-ide-insert-at-mentioned :which-key "Send selection")
+    "cr" '(claude-code-ide-resume :which-key "Resume conversation")
+    "cn" '(claude-code-ide-continue :which-key "Continue last")
+    "ct" '(claude-code-ide-toggle :which-key "Toggle window")
+    "cb" '(claude-code-ide-switch-to-buffer :which-key "Switch to Claude")
+    "cl" '(claude-code-ide-list-sessions :which-key "List sessions")
+    "ce" '(claude-code-ide-send-escape :which-key "Send escape")
+    "cq" '(claude-code-ide-stop :which-key "Stop session"))
+#+end_src
+
+** Undo tree
+Visual undo history for =SPC f u=, works on top of the built-in undo-redo.
+#+begin_src emacs-lisp
+  (use-package vundo
+    :commands vundo)
+#+end_src
+
+** Basemap
+Function keys and escape, same as nixvim's basemap and Telescope keys.
+
+=F5= opens magit. =lazydocker= and =lazysql= run full-window in a ghostel buffer.
+The buffer is killed when the program exits, and pressing the key again while
+it is running just switches back to it.
+#+begin_src emacs-lisp
+  (defun my/run-in-terminal (program)
+    "Run PROGRAM in its own ghostel buffer, reusing it while it is alive."
+    (let ((name (format "*%s*" program)))
+      (if (get-buffer name)
+          (switch-to-buffer name)
+        (require 'ghostel)
+        (let ((buf (get-buffer-create name)))
+          (switch-to-buffer buf)
+          (ghostel-exec buf program)))))
+
+  (defun my/lazydocker () (interactive) (my/run-in-terminal "lazydocker"))
+  (defun my/lazysql () (interactive) (my/run-in-terminal "lazysql"))
+
+  (defun my/escape ()
+    "Clear search highlights, then do the usual evil escape."
+    (interactive)
+    (evil-ex-nohighlight)
+    (evil-force-normal-state))
+
+  (general-define-key
+   :states 'normal
+   "<escape>" 'my/escape
+   "<f1>" 'my/find-project-files
+   "<S-f1>" 'consult-fd
+   "<f2>" 'consult-ripgrep
+   "<f3>" 'consult-buffer
+   "<f4>" 'kill-current-buffer
+   "<f5>" 'magit-status
+   "<f6>" 'my/lazydocker
+   "<f7>" 'my/lazysql)
+
+  (general-define-key
+   :states '(normal visual)
+   "s" 'evil-avy-goto-char-timer)
+
+  ;; F1 does nothing outside normal state (instead of opening Emacs help)
+  (general-define-key
+   :states '(insert visual replace operator)
+   "<f1>" 'ignore)
+#+end_src
+
+* Git
+** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :commands magit-status)
+#+end_src
+
+* Terminal
+** Ghostel
+Terminal emulator built on libghostty-vt. The native module is downloaded
+automatically the first time a terminal is opened.
+#+begin_src emacs-lisp
+  (use-package ghostel
+    :custom
+    (ghostel-module-auto-install 'download))
+#+end_src
+
+** Evil ghostel
+#+begin_src emacs-lisp
+  (use-package evil-ghostel
+    :after (ghostel evil)
+    :hook (ghostel-mode . evil-ghostel-mode))
+#+end_src
+
+* Claude Code
+Claude Code IDE integration over MCP, running inside a ghostel terminal.
+Not on MELPA, so it is installed straight from git.
+#+begin_src emacs-lisp
+  (use-package claude-code-ide
+    :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+    :custom
+    (claude-code-ide-terminal-backend 'ghostel)
+    :config
+    (claude-code-ide-emacs-tools-setup))
+#+end_src
+
+* Interface
+** Disable most GUI elements
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+end_src
+
+** Enable line numbers
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode 1)
+#+end_src
+
+** Highlight current line
+#+begin_src emacs-lisp
+  (global-hl-line-mode 1)
+#+end_src
+
+** Show parent parentheses
+Highlight the matching paren, also when point is inside the pair.
+#+begin_src emacs-lisp
+  (setq show-paren-delay 0
+        show-paren-when-point-inside-paren t)
+  (show-paren-mode 1)
+#+end_src
+
+** Enable prettify symbols mode
+#+begin_src emacs-lisp
+  (global-prettify-symbols-mode 1)
+#+end_src
+
+** Window title
+Same as the nixvim titlestring: =emacs parent/file=.
+#+begin_src emacs-lisp
+  (setq frame-title-format
+        '(:eval (if buffer-file-name
+                    (format "emacs %s/%s"
+                            (file-name-nondirectory
+                             (directory-file-name (file-name-directory buffer-file-name)))
+                            (file-name-nondirectory buffer-file-name))
+                  "emacs %b")))
+#+end_src
+
+* Behaviour
+** Follow symlinks to git-controlled files
+Opening config.org (or other symlinked dotfiles) jumps straight to the real
+file in the repo instead of asking every time.
+#+begin_src emacs-lisp
+  (setq vc-follow-symlinks t)
+#+end_src
+
+** Disable automatic creation of backup files
+#+begin_src emacs-lisp
+  (setq make-backup-files nil
+        auto-save-default nil
+        create-lockfiles nil)
+#+end_src
+
+** Enable copypasting outside of Emacs
+#+begin_src emacs-lisp
+  (setq select-enable-clipboard t
+        save-interprogram-paste-before-kill t)
+#+end_src
+
+** Disable ring-bell
+#+begin_src emacs-lisp
+  (setq ring-bell-function 'ignore)
+#+end_src
+
+** Enable conservative scrolling
+Scroll one line at a time instead of recentering when point leaves the window.
+#+begin_src emacs-lisp
+  (setq scroll-conservatively 101)
+#+end_src
+
+** Transform yes-or-no questions into y-or-n
+#+begin_src emacs-lisp
+  (setq use-short-answers t)
+#+end_src

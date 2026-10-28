@@ -201,12 +201,15 @@
       };
       monospace = {
         package = pkgs.nerd-fonts.fantasque-sans-mono;
-        name = "FantasqueSansMono Nerd Font";
+        # Nerd Fonts v3 family name (the old "FantasqueSansMono" no longer matches)
+        name = "FantasqueSansM Nerd Font";
       };
       emoji = {
         package = pkgs.noto-fonts-color-emoji;
         name = "Noto Color Emoji";
       };
+      # Terminals and editors (kitty, Emacs); default is 12
+      sizes.terminal = 14;
     };
   };
 

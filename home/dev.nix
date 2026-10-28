@@ -35,6 +35,13 @@ in
     recursive = true;
   };
 
+  # Link straight to the repo (not the store) so config.org edits apply
+  # without a rebuild and org-babel sees real mtimes when re-tangling.
+  home.file.".emacs.d/init.el".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nixos/home/emacs/init.el";
+  home.file.".emacs.d/config.org".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nixos/home/emacs/config.org";
+
   # Plasma/KWin reads this directly for native Wayland keyboard input.
   xdg.configFile."kxkbrc".text = ''
     [Layout]
@@ -46,7 +53,6 @@ in
 
   home.packages = with pkgs; [
     kamal
-    emacs
     opencode-desktop
     opencode
     bruno
@@ -78,6 +84,7 @@ in
     php84Packages.composer
     laravel
     ripgrep
+    fd
     delta
     codex
     rustc
@@ -113,6 +120,11 @@ in
     };
   };
   programs.delta.enableGitIntegration = true;
+
+  # Managed through programs.emacs (not home.packages) so the Stylix emacs
+  # target can add its base16 theme, font and opacity. Packages themselves
+  # are still installed by use-package from config.org.
+  programs.emacs.enable = true;
 
   programs.nixvim = {
     enable = true;
