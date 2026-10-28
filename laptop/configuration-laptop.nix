@@ -23,6 +23,7 @@
   services.xserver.xkb = {
     layout = "br";
     variant = "thinkpad";
+    options = "caps:escape";
   };
 
   users.users.kassio = {
