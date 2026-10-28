@@ -29,6 +29,7 @@
     brightnessctl
     impala
     bluetui
+    networkmanagerapplet # nm-connection-editor
     rose-pine-hyprcursor
     swappy
     wl-clipboard
