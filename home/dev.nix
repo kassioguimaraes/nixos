@@ -37,6 +37,7 @@ in
 
   home.packages = with pkgs; [
     kamal
+    emacs
     opencode-desktop
     opencode
     bruno

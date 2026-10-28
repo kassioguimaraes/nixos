@@ -21,6 +21,7 @@
             layout = "br";
             variant = "thinkpad";
             model = "pc104";
+            options = "caps:escape";
           };
         };
         touchpad = {
