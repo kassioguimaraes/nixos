@@ -10,7 +10,6 @@
     qt6Packages.qt6ct
     gpu-screen-recorder
   ];
-  services.cliphist.enable = true;
   programs.noctalia = {
     enable = true;
     # Noctalia 5 config: stock bar plus a taskbar of the active workspace
