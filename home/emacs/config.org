@@ -123,6 +123,7 @@ live preview.
 =M-j= / =M-k= move through results, like the Telescope mappings.
 #+begin_src emacs-lisp
   (use-package vertico
+    :demand t  ; :bind would otherwise defer loading, and vertico-mode never starts
     :custom
     (vertico-cycle t)
     :bind (:map vertico-map
@@ -179,6 +180,271 @@ picked up on each switch, so new clones show up without visiting them first.
     (call-interactively #'project-switch-project))
 #+end_src
 
+* Code
+Language servers, tree-sitter, completion, diagnostics and formatting. The
+servers, formatters and tree-sitter grammars are installed by =emacs.nix=.
+
+** Tree-sitter
+Grammars come prebuilt from Nix. Emacs 31 switches every language with a
+grammar to its tree-sitter mode.
+#+begin_src emacs-lisp
+  (setopt treesit-enabled-modes t)
+
+  (use-package nix-ts-mode
+    :mode "\\.nix\\'")
+#+end_src
+
+** Vue and Svelte
+No tree-sitter modes for these, so they get thin modes on top of web-mode.
+Separate mode names let eglot pick the right server for each.
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :mode (("\\.vue\\'" . vue-mode)
+           ("\\.svelte\\'" . svelte-mode))
+    :config
+    (define-derived-mode vue-mode web-mode "Vue")
+    (define-derived-mode svelte-mode web-mode "Svelte"))
+#+end_src
+
+** Trusted content
+Emacs 30+ only runs code-executing checkers (eglot's flymake backend
+included) in trusted files. Without this, flymake disables eglot's backend
+and no errors show. Add other directories here if you code outside ~/code.
+#+begin_src emacs-lisp
+  (setq trusted-content '("~/code/"))
+#+end_src
+
+** Eglot
+Starts automatically for every language below. Most servers are eglot's
+defaults; the rest are listed explicitly.
+
+vue-language-server 3 only works as a plugin of typescript-language-server,
+so =.vue= files run that with the plugin (path set by =emacs.nix=). Script
+blocks get full TypeScript support; templates don't.
+#+begin_src emacs-lisp
+  (defvar my/vue-typescript-plugin nil
+    "Path to @vue/typescript-plugin, set from emacs.nix.")
+
+  (defun my/vue-eglot-contact (&rest _)
+    "typescript-language-server with the Vue plugin."
+    `("typescript-language-server" "--stdio"
+      :initializationOptions
+      (:plugins [(:name "@vue/typescript-plugin"
+                  :location ,my/vue-typescript-plugin
+                  :languages ["vue"])])))
+
+  (use-package eglot
+    :ensure nil
+    :hook ((rust-ts-mode go-ts-mode python-ts-mode
+            typescript-ts-mode tsx-ts-mode js-ts-mode
+            vue-mode svelte-mode html-ts-mode mhtml-ts-mode mhtml-mode
+            php-ts-mode nix-ts-mode json-ts-mode yaml-ts-mode)
+           . eglot-ensure)
+    :commands (eglot-rename eglot-code-actions eglot-format-buffer)
+    :custom
+    (eglot-autoshutdown t)
+    (eglot-events-buffer-config '(:size 0 :format short))
+    (eglot-max-file-watches 5000)
+    ;; Connect in the background instead of blocking while the server starts
+    (eglot-sync-connect nil)
+    (eglot-report-progress nil)
+    ;; No lightbulb/margin hints for available code actions (SPC g a lists them)
+    (eglot-code-action-indications nil)
+    :init
+    ;; Servers send large JSON payloads; read them in bigger chunks
+    (setq read-process-output-max (* 1024 1024))
+    :config
+    (dolist (server `((nix-ts-mode . ("nixd"))
+                      (php-ts-mode . ("intelephense" "--stdio"))
+                      (python-ts-mode . ("pyright-langserver" "--stdio"))
+                      (svelte-mode . ("svelteserver" "--stdio"))
+                      ((html-ts-mode mhtml-ts-mode mhtml-mode)
+                       . ("vscode-html-language-server" "--stdio"))
+                      (vue-mode . my/vue-eglot-contact)))
+      (add-to-list 'eglot-server-programs server)))
+#+end_src
+
+** Completion
+Replaces blink-cmp: popup while typing, nothing preselected, =TAB= /
+=S-TAB= select and insert, =RET= accepts, =C-e= hides, =C-d= toggles docs,
+=C-j= / =C-k= scroll them. Docs show next to the popup automatically.
+#+begin_src emacs-lisp
+  (use-package corfu
+    :demand t
+    :custom
+    (corfu-auto t)
+    (corfu-auto-delay 0.1)
+    (corfu-auto-prefix 2)
+    (corfu-cycle t)
+    (corfu-preselect 'prompt)
+    (corfu-preview-current 'insert)
+    (corfu-popupinfo-delay '(0.3 . 0.2))
+    :bind (:map corfu-map
+                ("TAB" . corfu-next)
+                ([tab] . corfu-next)
+                ("S-TAB" . corfu-previous)
+                ([backtab] . corfu-previous)
+                ("RET" . corfu-insert)
+                ("C-e" . corfu-quit)
+                ("C-d" . corfu-popupinfo-toggle)
+                ("C-j" . corfu-popupinfo-scroll-up)
+                ("C-k" . corfu-popupinfo-scroll-down))
+    :config
+    (global-corfu-mode 1)
+    (corfu-popupinfo-mode 1))
+#+end_src
+
+Words from open buffers are mixed into the LSP results, like blink's
+=buffer= source.
+#+begin_src emacs-lisp
+  (use-package cape
+    :demand t
+    :config
+    (add-hook 'completion-at-point-functions #'cape-dabbrev)
+
+    (defun my/eglot-capf ()
+      (setq-local completion-at-point-functions
+                  (list (cape-capf-super #'eglot-completion-at-point
+                                         #'cape-dabbrev))))
+    (add-hook 'eglot-managed-mode-hook #'my/eglot-capf))
+#+end_src
+
+Expands the snippets that language servers send (luasnip's job in nvim).
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :demand t
+    :config
+    (yas-global-mode 1))
+#+end_src
+
+** Diagnostics
+Messages shown at the end of the line, like lsp-lines / virtual_text.
+#+begin_src emacs-lisp
+  (setq flymake-show-diagnostics-at-end-of-line t)
+#+end_src
+
+golangci-lint on top of gopls. Eglot replaces all flymake backends in the
+buffers it manages, so this one is added back after eglot starts. It lints
+the saved package, so results refresh on save.
+#+begin_src emacs-lisp
+  (defvar-local my/golangci--proc nil)
+
+  (defun my/golangci-flymake (report-fn &rest _)
+    "Flymake backend running golangci-lint on the current file's package."
+    (when (process-live-p my/golangci--proc)
+      (kill-process my/golangci--proc))
+    (let* ((source (current-buffer))
+           (file (buffer-file-name))
+           (default-directory (file-name-directory file)))
+      (setq my/golangci--proc
+            (make-process
+             :name "golangci-lint" :noquery t :connection-type 'pipe
+             :buffer (generate-new-buffer " *golangci-lint*")
+             :command '("golangci-lint" "run" "--path-mode=abs"
+                        "--output.text.path=stdout"
+                        "--output.text.print-issued-lines=false"
+                        "--output.text.colors=false"
+                        "--show-stats=false" "--issues-exit-code=0" "./")
+             :sentinel
+             (lambda (proc _event)
+               (when (memq (process-status proc) '(exit signal))
+                 (unwind-protect
+                     (when (and (buffer-live-p source)
+                                (eq proc (buffer-local-value 'my/golangci--proc source)))
+                       (with-current-buffer (process-buffer proc)
+                         (goto-char (point-min))
+                         (let (diags)
+                           (while (re-search-forward
+                                   "^\\([^:\n]+\\):\\([0-9]+\\):\\(?:\\([0-9]+\\):\\)? \\(.*\\)$"
+                                   nil t)
+                             ;; Compile errors come with relative paths and a
+                             ;; ": # pkg" header line; skip the header
+                             (when (and (file-equal-p (expand-file-name (match-string 1)) file)
+                                        (not (string-prefix-p ": " (match-string 4))))
+                               (let ((region (flymake-diag-region
+                                              source
+                                              (string-to-number (match-string 2))
+                                              (and (match-string 3)
+                                                   (string-to-number (match-string 3))))))
+                                 (push (flymake-make-diagnostic
+                                        source (car region) (cdr region)
+                                        :warning (match-string 4))
+                                       diags))))
+                           (funcall report-fn diags))))
+                   (kill-buffer (process-buffer proc)))))))))
+
+  (defun my/golangci-setup ()
+    (when (derived-mode-p 'go-ts-mode)
+      (add-hook 'flymake-diagnostic-functions #'my/golangci-flymake nil t)))
+  (add-hook 'eglot-managed-mode-hook #'my/golangci-setup)
+#+end_src
+
+** Docs
+=SPC g h= opens docs in a popup (lspsaga hover); nothing shows in the echo
+area on its own.
+#+begin_src emacs-lisp
+  ;; Keep eldoc running (it fills the *eldoc* buffer SPC g h reads from) but
+  ;; don't print signatures/docs in the echo area when point moves.
+  (setq eldoc-display-functions '(eldoc-display-in-buffer))
+
+  (use-package eldoc-box
+    :commands eldoc-box-help-at-point)
+#+end_src
+
+** Formatting
+=SPC f f= formats like none-ls did: nixfmt for Nix, black for Python, the
+language server for everything else, then rustywind sorts Tailwind classes in
+web files. Nothing formats on save.
+#+begin_src emacs-lisp
+  (use-package apheleia
+    :commands apheleia-format-buffer
+    :config
+    (add-to-list 'apheleia-formatters '(rustywind "rustywind" "--stdin")))
+
+  (defvar my/formatters
+    '((nix-ts-mode . nixfmt)
+      (python-ts-mode . black))
+    "Major modes formatted by an external formatter instead of the LSP.")
+
+  (defvar my/tailwind-modes
+    '(typescript-ts-mode tsx-ts-mode js-ts-mode vue-mode svelte-mode
+      html-ts-mode mhtml-ts-mode mhtml-mode)
+    "Major modes where rustywind runs after the LSP formats.")
+
+  (defun my/format-buffer ()
+    "Format the buffer with its formatter, or the language server."
+    (interactive)
+    (if-let* ((formatter (alist-get major-mode my/formatters)))
+        (apheleia-format-buffer formatter)
+      (if (and (fboundp 'eglot-managed-p) (eglot-managed-p)
+               (eglot-server-capable :documentFormattingProvider))
+          (eglot-format-buffer)
+        (message "No formatter for %s" major-mode))
+      (when (memq major-mode my/tailwind-modes)
+        (apheleia-format-buffer 'rustywind))))
+#+end_src
+
+** Text objects
+Tree-sitter text objects, same keys as the mini.ai setup: =f= function,
+=c= class, =i= conditional, =t= comment, =a= parameter (=af=, =if=, ...).
+=at= / =it= replace evil's tag objects, as in nvim.
+#+begin_src emacs-lisp
+  (use-package evil-textobj-tree-sitter
+    :after evil
+    :config
+    ;; get-textobj is a macro and needs literal strings, hence no loop
+    (define-key evil-outer-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.outer"))
+    (define-key evil-inner-text-objects-map "f" (evil-textobj-tree-sitter-get-textobj "function.inner"))
+    (define-key evil-outer-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.outer"))
+    (define-key evil-inner-text-objects-map "c" (evil-textobj-tree-sitter-get-textobj "class.inner"))
+    (define-key evil-outer-text-objects-map "i" (evil-textobj-tree-sitter-get-textobj "conditional.outer"))
+    (define-key evil-inner-text-objects-map "i" (evil-textobj-tree-sitter-get-textobj "conditional.inner"))
+    (define-key evil-outer-text-objects-map "t" (evil-textobj-tree-sitter-get-textobj "comment.outer"))
+    (define-key evil-inner-text-objects-map "t" (evil-textobj-tree-sitter-get-textobj "comment.outer"))
+    (define-key evil-outer-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer"))
+    (define-key evil-inner-text-objects-map "a" (evil-textobj-tree-sitter-get-textobj "parameter.outer")))
+#+end_src
+
 * Keybindings
 ** Which-key
 Shows the available keys after a prefix (like =SPC=). Built into Emacs 30+.
@@ -207,13 +473,8 @@ win over mode maps such as dired and magit.
 #+end_src
 
 ** Leader bindings
-Mirrors the nixvim which-key layout. Eglot's commands aren't autoloaded, so
-declare the ones bound below.
+Mirrors the nixvim which-key layout.
 #+begin_src emacs-lisp
-  (use-package eglot
-    :ensure nil
-    :commands (eglot-rename eglot-code-actions))
-
   (my/leader
     "x" '(execute-extended-command :which-key "Command")
     "q" '(save-buffers-kill-terminal :which-key "Quit")
@@ -224,6 +485,7 @@ declare the ones bound below.
     "fF" '(consult-fd :which-key "Find files")
     "fe" '(dired-jump :which-key "Explorer")
     "fs" '(save-buffer :which-key "Save file")
+    "ff" '(my/format-buffer :which-key "Format file")
     "fd" '(kill-current-buffer :which-key "Close file")
     "fu" '(vundo :which-key "Undo tree")
     "fg" '(consult-ripgrep :which-key "Grep files")
@@ -233,7 +495,8 @@ declare the ones bound below.
 
     "g"  '(:ignore t :which-key "Lsp")
     "gd" '(xref-find-definitions :which-key "Go to definition")
-    "gh" '(eldoc :which-key "Show documentation")
+    "gh" '(eldoc-box-help-at-point :which-key "Show documentation")
+    "gf" '(xref-find-references :which-key "Find references")
     "go" '(consult-imenu :which-key "Outline")
     "gr" '(eglot-rename :which-key "Rename symbol")
     "ga" '(eglot-code-actions :which-key "Code actions")
@@ -367,11 +630,43 @@ Not on MELPA, so it is installed straight from git.
 #+end_src
 
 * Interface
+** Theme fix: gnus face cycle
+Emacs 31 makes =gnus-group-news-N= inherit =gnus-group-news-N-empty=, while
+base16-theme (used by Stylix) makes the =-empty= faces inherit the other way.
+When something loads gnus before the theme, startup fails with "Face
+inheritance results in inheritance cycle". Drop the Emacs-side inheritance
+before gnus defines these faces; the theme still styles them.
+#+begin_src emacs-lisp
+  (dolist (face '(gnus-group-mail-1 gnus-group-mail-2 gnus-group-mail-3
+                  gnus-group-mail-low
+                  gnus-group-news-1 gnus-group-news-2 gnus-group-news-3
+                  gnus-group-news-4 gnus-group-news-5 gnus-group-news-6
+                  gnus-group-news-low))
+    (face-spec-set face '((t :inherit nil)) 'face-defface-spec))
+#+end_src
+
 ** Disable most GUI elements
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+#+end_src
+
+** Modeline
+Replaces lualine. Icons come from the Stylix monospace font, which is
+already a Nerd Font.
+#+begin_src emacs-lisp
+  (use-package nerd-icons
+    :custom
+    (nerd-icons-font-family "FantasqueSansM Nerd Font"))
+
+  (use-package doom-modeline
+    :demand t
+    :custom
+    (doom-modeline-buffer-file-name-style 'relative-from-project)
+    (doom-modeline-buffer-encoding nil)
+    :config
+    (doom-modeline-mode 1))
 #+end_src
 
 ** Enable line numbers
@@ -442,6 +737,9 @@ Scroll one line at a time instead of recentering when point leaves the window.
 #+end_src
 
 ** Transform yes-or-no questions into y-or-n
+Also ask in the minibuffer instead of popping up a GUI dialog box (e.g.
+"Active processes exist; kill them and exit anyway?" when quitting).
 #+begin_src emacs-lisp
-  (setq use-short-answers t)
+  (setq use-short-answers t
+        use-dialog-box nil)
 #+end_src
