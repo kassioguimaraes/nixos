@@ -8,7 +8,6 @@ let
       gnugrep
       gnused
       kdePackages.libkscreen
-      procps
       systemd
       wireplumber
     ];
@@ -109,29 +108,8 @@ let
         echo "Audio output: $pattern (node $sink_id)"
       }
 
-      stop_gamepad_ui() {
-        systemctl --user stop "$game_unit" 2>/dev/null || true
-      }
-
-      stop_steam() {
-        # Steam reuses an existing client, so starting it with -gamepadui while
-        # the desktop client is running does not reliably create the Gamescope
-        # session managed by tv-gamepad-ui.service.
-        stop_gamepad_ui
-        if pgrep -x steam >/dev/null; then
-          echo "Stopping the existing Steam client"
-          pkill -x steam || true
-          for _ in {1..50}; do
-            pgrep -x steam >/dev/null || return
-            sleep 0.1
-          done
-          die "Steam did not exit after 5 seconds"
-        fi
-      }
-
       tv_mode() {
         local tv desktops output tv_mode_id
-        stop_steam
         tv="$(detect_tv)"
         desktops="$(detect_desktops "$tv")"
         tv_mode_id="$(mode_id "$tv" "$tv_mode_match")"
@@ -152,7 +130,6 @@ let
 
       desktop_mode() {
         local tv desktops output
-        stop_gamepad_ui
         tv="$(detect_tv)"
         desktops="$(detect_desktops "$tv")"
         [[ -n "$desktops" ]] || die "no desktop displays were detected"
@@ -290,12 +267,12 @@ in {
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  # Gamescope/Steam is owned by a user service so desktop mode can reliably
-  # close only the instance that TV mode launched.
+  # Steam is launched directly in Gamepad UI.  Do not stop this unit when the
+  # display or controller changes: the existing Steam client must stay alive.
   systemd.user.services.tv-gamepad-ui = {
     Unit.Description = "Steam Gamepad UI on the TV";
     Service = {
-      ExecStart = "${lib.getExe pkgs.gamescope} -f -e --hide-cursor-delay 3000 -- ${lib.getExe pkgs.steam} -gamepadui";
+      ExecStart = "${lib.getExe pkgs.steam} -gamepadui";
       Restart = "on-failure";
       RestartSec = 2;
     };
@@ -304,7 +281,7 @@ in {
   xdg.desktopEntries = {
     tv-mode = {
       name = "TV Mode";
-      comment = "Use the TV for Gamescope and Steam";
+      comment = "Use the TV for Steam Gamepad UI";
       icon = "steam";
       exec = "${lib.getExe displayMode} tv";
       terminal = false;

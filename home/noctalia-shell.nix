@@ -13,52 +13,56 @@
   services.cliphist.enable = true;
   programs.noctalia = {
     enable = true;
+    # Noctalia 5 config: stock bar plus a taskbar of the active workspace
     settings = {
-      appLauncher = {
-        enableClipboardHistory = true;
-        autoPasteClipboard = false;
-        terminalCommand = "kitty -e";
+      bar.default = {
+        start = [ "launcher" "workspaces" "layout" "taskbar" ];
+        # Stock list minus bluetooth
+        end = [
+          "media"
+          "tray"
+          "notifications"
+          "clipboard"
+          "network"
+          "volume"
+          "brightness"
+          "battery"
+          "control-center"
+          "session"
+        ];
+        # Full width, square, slimmer
+        margin_ends = 0;
+        radius = 0;
+        radius_top_left = 0;
+        radius_top_right = 0;
+        radius_bottom_left = 0;
+        radius_bottom_right = 0;
+        concave_edge_corners = false;
+        thickness = 24;
       };
-      bar = {
-        density = "compact";
-        showCapsule = false;
-        floating = true;
-        outerCorners = false;
-        widgets = {
-          left = [
-            { id = "Launcher"; }
-            { id = "Workspace"; }
-            { id = "ActiveWindow";
-              colorizeIcons = true;
-              maxWidth = 250;
-            }
-          ];
-          center = [{ id = "Clock"; }];
-          right = [
-            {
-              id = "MediaMini";
-              maxWidth = 250;
-              compactMode = true;
-              showVisualizer = true;
-              visualizerType = "wave";
-            }
-            { id = "ScreenRecorder"; }
-            { id = "VPN"; }
-            { id = "Tray";
-              colorizeIcons = true;
-            }
-            { id = "NotificationHistory"; }
-            { id = "Battery"; }
-            { id = "Brightness"; }
-            { id = "Volume"; }
-            {
-              id = "ControlCenter";
-              useDistroLogo = true;
-            }
-          ];
-        };
+      widget.network.show_label = false;
+      # Hyprland overwrites the text via layout-symbol.toml (see hyprland.lua)
+      widget.layout = {
+        type = "text";
+        text = "[]=";
+        # Brackets dip below the baseline; a bigger glyph centers better
+        font_scale = 1.2;
       };
-      location = { name = "Macapá"; };
+      dock = {
+        enabled = true;
+        reserve_space = false;
+        auto_hide = true;
+        show_dots = true;
+      };
+      widget.taskbar = {
+        only_active_workspace = true;
+        show_active_indicator = true;
+        show_window_title = true;
+      };
+      # Hyprland workspaces are named 1-5 on every monitor
+      widget.workspaces.label_source = "name";
+      # hyprpaper draws the wallpaper in Hyprland
+      wallpaper.enabled = false;
     };
   };
 }

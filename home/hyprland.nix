@@ -1,189 +1,25 @@
-{ config, pkgs, inputs, ... }:
+{ pkgs, inputs, ... }:
 
 {
-  #imports = [ ./waybar.nix ];
+  imports = [ ./noctalia-shell.nix ];
+
+  # Start hyprpaper only in Hyprland, not in every graphical session (Plasma)
+  services.hyprpaper.systemdTarget = "hyprland-session.target";
+
   wayland.windowManager.hyprland = {
     enable = true;
-    plugins = with pkgs.hyprlandPlugins; [ ];
-    settings = {
-      env = [ "HYPRCURSOR_THEME,rose-pine-hyprcursor" "HYPRCURSOR_SIZE,24" ];
-      plugin = {
+    # Use the Hyprland and portal from programs.hyprland (NixOS module)
+    package = null;
+    portalPackage = null;
+    configType = "lua";
+
+    extraLuaFiles = {
+      hyprsplit = {
+        autoLoad = false;
+        content = builtins.readFile "${inputs.hyprsplit}/init.lua";
       };
-
-      workspace = [
-        "5, layoutopt:orientation:top"
-        "6, layoutopt:orientation:top"
-        "7, layoutopt:orientation:top"
-        "8, layoutopt:orientation:top"
-      ];
-
-      general = {
-        layout = "master";
-        gaps_in = 3;
-        gaps_out = 6;
-      };
-      xwayland = { force_zero_scaling = true; };
-
-      decoration = {
-        rounding = 10;
-        rounding_power = 2;
-        shadow = {
-          enabled = true;
-          range = 4;
-          render_power = 3;
-        };
-
-        blur = {
-          enabled = true;
-          size = 3;
-          passes = 1;
-          vibrancy = 0.1696;
-        };
-      };
-      exec-once = [ "noctalia" "nextcloud" ];
-
-      "$mod" = "SUPER";
-      "$alt" = "ALT_L";
-      "$terminal" = "kitty";
-      "$menu" = "noctalia ipc call launcher toggle";
-      "$clipboard" = "noctalia ipc call launcher clipboard";
-      "$controlcenter" = "noctalia ipc call controlCenter toggle";
-      "$sessionMenu" = "noctalia ipc call sessionMenu toggle";
-      "$suspend" = "noctalia ipc call sessionMenu lockAndSuspend";
-      "$lock" = "noctalia ipc call sessionMenu lock";
-      "$wifi" = "noctalia ipc call network togglePanel";
-      "$bluetooth" = "noctalia ipc call bluetooth togglePanel";
-
-      input = {
-        "kb_model" = "pc104";
-        "kb_layout" = "br";
-        "kb_variant" = "thinkpad";
-        touchpad = { "natural_scroll" = true; };
-      };
-      master = { "mfact" = 0.6; };
-
-      binds = { movefocus_cycles_fullscreen = true; };
-
-      bind = [
-        #noctalia
-        "$mod,escape , exec,$controlcenter"
-        "$mod SHIFT, L, exec,$lock"
-        "$mod CTRL, L, exec,$suspend"
-        "$mod SHIFT, P, exec,$sessionMenu"
-        "$mod SHIFT, W, exec,$wifi"
-        "$mod SHIFT, B, exec,$bluetooth"
-
-        #wm
-        "$mod, RETURN, exec, kitty"
-        "$mod SHIFT, C, killactive"
-        "$mod, SPACE, togglefloating"
-        "$mod, F, fullscreen,1 "
-        "$mod SHIFT, F, fullscreen "
-        "$alt, Q, exec,$menu"
-        "$alt, V, exec,$clipboard"
-        "$mod, 1, split:workspace, 1"
-        "$mod, 2, split:workspace, 2"
-        "$mod, 3, split:workspace, 3"
-        "$mod, 4, split:workspace, 4"
-        "$mod, 5, split:workspace, 5"
-        "$mod SHIFT, 1, split:movetoworkspace, 1"
-        "$mod SHIFT, 2, split:movetoworkspace, 2"
-        "$mod SHIFT, 3, split:movetoworkspace, 3"
-        "$mod SHIFT, 4, split:movetoworkspace, 4"
-        "$mod SHIFT, 5, split:movetoworkspace, 4"
-        "$mod ,a, focusmonitor, -1"
-        "$mod ,s, focusmonitor, +1"
-        "$mod SHIFT ,a, movewindow, mon:-1"
-        "$mod SHIFT ,s, movewindow, mon:+1"
-        "$mod, I,layoutmsg, swapwithmaster ignoremaster"
-        "$mod, J,layoutmsg, cyclenext"
-        "$mod, K,layoutmsg, cycleprev"
-        "$mod SHIFT, J, layoutmsg, swapnext"
-        "$mod SHIFT K, layoutmsg, swapnext,prev"
-        "$mod, O, layoutmsg, addmaster"
-        "$mod SHIFT, O, layoutmsg, removemaster"
-
-        #screenshots
-        ", Print, exec, hyprshot -m output --raw | swappy -f -"
-        "CTRL, Print, exec, hyprshot -m window --raw | swappy -f -"
-        "SHIFT, Print, exec, hyprshot -m region --raw | swappy -f -"
-
-        #discord. set ppt to shift_r
-        ", Shift_R, pass, class:^(discord)$"
-      ];
-      bindm = [ "$mod, mouse:272, movewindow" "$mod, mouse:273, resizewindow" ];
-      bindel = [
-        ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
-        ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-        ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-        ", XF86MonBrightnessUp, exec, brightnessctl -e4 -n2 set 5%+"
-        ", XF86MonBrightnessDown, exec, brightnessctl -e4 -n2 set 5%-"
-      ];
-
-      bindl = [
-        ", XF86AudioNext, exec, playerctl next"
-        ", XF86AudioPause, exec, playerctl play-pause"
-        ", XF86AudioPlay, exec, playerctl play-pause"
-        ", XF86AudioPrev, exec, playerctl previous"
-      ];
-      windowrule = [
-        {
-          name = "floatingmodal";
-          match.modal = 1;
-          float = true;
-          center = true;
-        }
-        {
-          name = "dialogsandmore";
-          match.title = ".*(Dialog|dialog|About|Error|Warning).*";
-          float = true;
-          center = true;
-        }
-        {
-          name = "savefile";
-          match.title = ".*(Save|Open|Select|Choose).*";
-          float = true;
-          center = true;
-        }
-        {
-          name = "prefs";
-          match.title = ".*(Preferences|Settings|Options).*";
-          float = true;
-          center = true;
-        }
-        {
-          name = "thunar file";
-          match.title = ".*File Operation Progress";
-          float = true;
-          center = true;
-        }
-        {
-          name = "firefox pip";
-          match.title = ".*Picture-in-Picture";
-          float = true;
-          center = false;
-          pin = true;
-          move = "100%-w-10 40";
-          size = "25% 15%";
-          content = "video";
-        }
-      ];
+      config = ./hyprland/hyprland.lua;
     };
-    extraConfig = ''
-       bind = $mod, R,submap, resize
-       submap = resize
-           binde = ,L, resizeactive, 20 0
-           binde = ,H, resizeactive, -20 0
-           binde = ,J, resizeactive, 0 -20
-           binde = ,K, resizeactive, 0 20
-           binde = ,Return,submap,reset
-           bind = , escape, submap, reset
-           bind = , Return, submap, reset
-           bind = $mod,R , submap, reset
-      submap = reset
-    '';
-    #floats
   };
 
   home.packages = with pkgs; [

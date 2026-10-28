@@ -15,6 +15,11 @@
     };
 
     nixvim = { url = "github:nix-community/nixvim"; };
+    # Only the Lua library (init.lua) is used, so skip its flake inputs
+    hyprsplit = {
+      url = "github:shezdy/hyprsplit";
+      flake = false;
+    };
     stylix = {
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -35,6 +40,7 @@
           nixpkgs.config.allowUnfree = true;
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+          home-manager.extraSpecialArgs = { inherit inputs; };
           home-manager.sharedModules = [ nixvim.homeModules.nixvim ];
           programs.anime-game-launcher.package =
             aagl.packages.${system}.anime-game-launcher;

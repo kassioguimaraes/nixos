@@ -32,6 +32,7 @@
   };
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
+  programs.hyprland.enable = true;
 
   # Keep the DualShock 4 touchpad from controlling the Plasma cursor while
   # preserving the controller itself for games.
@@ -44,6 +45,7 @@
   services.xserver.xkb = {
     layout = "br";
     variant = "";
+    options = "caps:escape";
   };
 
   users.users.kassio = {

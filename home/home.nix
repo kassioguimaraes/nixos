@@ -30,6 +30,7 @@
     kdePackages.gwenview
     kdePackages.kate
     vesktop
+    umu-launcher
   ];
 
   services.easyeffects.enable = true;
@@ -55,7 +56,12 @@
       fi
     '';
   };
-  programs.discord.enable = true;
+  programs.discord = {
+    enable = true;
+    # Discord's keybind recorder and push-to-talk only see keys through X11,
+    # so keep it on XWayland instead of Electron's native Wayland backend
+    package = pkgs.discord.override { commandLineArgs = "--ozone-platform=x11"; };
+  };
   stylix.targets.lazygit.colors.enable = false;
 
   services = { };

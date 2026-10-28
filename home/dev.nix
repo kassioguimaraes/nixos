@@ -35,6 +35,15 @@ in
     recursive = true;
   };
 
+  # Plasma/KWin reads this directly for native Wayland keyboard input.
+  xdg.configFile."kxkbrc".text = ''
+    [Layout]
+    LayoutList=br
+    Options=caps:escape
+    Use=true
+  '';
+  xdg.configFile."kxkbrc".force = true;
+
   home.packages = with pkgs; [
     kamal
     emacs
