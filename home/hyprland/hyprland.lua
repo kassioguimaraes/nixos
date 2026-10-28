@@ -19,6 +19,11 @@ end)
 
 hl.env("HYPRCURSOR_THEME", "rose-pine-hyprcursor")
 hl.env("HYPRCURSOR_SIZE", "24")
+-- XWayland apps (Discord) use the xcursor version of the same theme
+hl.env("XCURSOR_THEME", "BreezeX-RosePine-Linux")
+hl.env("XCURSOR_SIZE", "24")
+hl.env("XCURSOR_PATH", os.getenv("HOME") .. "/.icons:/etc/profiles/per-user/" .. os.getenv("USER")
+    .. "/share/icons:/run/current-system/sw/share/icons")
 
 ----------------------
 ---- LOOK & FEEL -----

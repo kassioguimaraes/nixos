@@ -41,6 +41,7 @@
         thickness = 24;
       };
       widget.network.show_label = false;
+      shell.clipboard_history_max_entries = 2000;
       # Hyprland overwrites the text via layout-symbol.toml (see hyprland.lua)
       widget.layout = {
         type = "text";

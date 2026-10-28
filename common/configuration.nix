@@ -184,6 +184,12 @@
       popups = 0.85;
       desktop = 0.85;
     };
+    # xcursor version of the rose-pine-hyprcursor theme Hyprland uses
+    cursor = {
+      package = pkgs.rose-pine-cursor;
+      name = "BreezeX-RosePine-Linux";
+      size = 24;
+    };
     fonts = {
       serif = {
         package = pkgs.noto-fonts;
