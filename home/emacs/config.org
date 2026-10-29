@@ -142,6 +142,10 @@ so =~/c/n/h= expands to =~/code/nixos/home=.
 #+begin_src emacs-lisp
   (use-package orderless
     :custom
+    ;; Project files (F1) and other completion candidates match regardless
+    ;; of capitalization, while preserving the actual filename on selection.
+    (completion-ignore-case t)
+    (read-file-name-completion-ignore-case t)
     (completion-styles '(orderless basic))
     (completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
