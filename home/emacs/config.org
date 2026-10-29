@@ -604,10 +604,20 @@ it is running just switches back to it.
 ** Ghostel
 Terminal emulator built on libghostty-vt. The native module is downloaded
 automatically the first time a terminal is opened.
+
+=F8= jumps back to the previous buffer from anywhere, including from inside a
+terminal in insert state. Ghostel forwards function keys to the terminal, so
+=F8= is added to its exceptions to let Emacs handle it.
 #+begin_src emacs-lisp
+  (keymap-global-set "<f8>" #'previous-buffer)
+
   (use-package ghostel
     :custom
-    (ghostel-module-auto-install 'download))
+    (ghostel-module-auto-install 'download)
+    :hook (ghostel-mode . (lambda () (display-line-numbers-mode -1)))
+    :config
+    (customize-set-variable 'ghostel-keymap-exceptions
+                            (cons "<f8>" ghostel-keymap-exceptions)))
 #+end_src
 
 ** Evil ghostel
