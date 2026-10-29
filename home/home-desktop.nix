@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   home.username = "kassio";
@@ -11,6 +11,22 @@
     ./gaming/display-mode.nix
     ./hyprland.nix
   ];
+
+  # SDDM autologin has no password to pass to PAM, so open this desktop's
+  # passwordless KDE wallet right before starting Nextcloud in Hyprland.
+  # Doing it in ExecStartPre (rather than a separate unit ordered after
+  # hyprland-session.target) avoids an ordering cycle with that target.
+  systemd.user.services.nextcloud-hyprland = {
+    Unit = {
+      Description = "Nextcloud desktop client in Hyprland";
+      PartOf = [ "hyprland-session.target" ];
+    };
+    Service = {
+      ExecStartPre = "${pkgs.systemd}/bin/busctl --user call org.kde.kwalletd6 /modules/kwalletd6 org.kde.KWallet open sxs kdewallet 0 hyprland-session";
+      ExecStart = "${pkgs.nextcloud-client}/bin/nextcloud";
+    };
+    Install.WantedBy = [ "hyprland-session.target" ];
+  };
 
   wayland.windowManager.hyprland.extraLuaFiles.desktop = ''
     -- Primary monitor at 0,0

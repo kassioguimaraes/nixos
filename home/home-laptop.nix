@@ -15,6 +15,9 @@
   # so give X11 toolkits the matching 120 DPI font/UI scale explicitly.
   wayland.windowManager.hyprland.extraLuaFiles.laptop = ''
     hl.monitor({ output = "eDP-1", mode = "1920x1200@60", position = "0x0", scale = 1.25 })
+    hl.on("hyprland.start", function()
+      hl.exec_cmd("nextcloud")
+    end)
   '';
 
   # Stylix already owns ~/.Xresources, so extend its resource set rather than
