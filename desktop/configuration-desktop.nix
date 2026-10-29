@@ -64,6 +64,7 @@
   stylix = {
     image = ../home/assets/wallpapers/gr.jpg;
     polarity = "dark";
+    fonts.sizes.terminal = 14;
     icons = {
       enable = true;
       package = pkgs.tela-icon-theme;
