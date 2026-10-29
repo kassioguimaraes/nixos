@@ -41,7 +41,7 @@
     enable = true;
     image = ../home/assets/wallpapers/wall2.jpg;
     polarity = "dark";
-    fonts.sizes.terminal = 13;
+    fonts.sizes.terminal = 14;
 
     icons = {
       enable = true;

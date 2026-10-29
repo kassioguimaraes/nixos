@@ -8,11 +8,28 @@ local alt = "ALT"
 local terminal = "kitty"
 local noctalia = "noctalia msg "
 
+-- Focus an existing app window (even if it is on another workspace), or start
+-- the app when it is not running.  This uses Hyprland's Lua API directly so
+-- the lookup happens when the key is pressed, rather than through a shell.
+local function focus_or_spawn(class, command)
+    return function()
+        for _, window in ipairs(hl.get_windows()) do
+            if string.lower(window.class) == class then
+                hl.dispatch(hl.dsp.focus({ window = "address:" .. window.address }))
+                return
+            end
+        end
+        hl.dispatch(hl.dsp.exec_cmd(command))
+    end
+end
+
 --------------------
 ---- AUTOSTART -----
 --------------------
 
 hl.on("hyprland.start", function()
+    -- Apply the laptop's Xft.dpi resource before X11 applications start.
+    hl.exec_cmd("xrdb -merge ~/.Xresources")
     hl.exec_cmd("nextcloud")
 end)
 
@@ -160,7 +177,9 @@ hl.bind(alt .. " + V", hl.dsp.exec_cmd(noctalia .. "panel-toggle clipboard"))
 hl.bind(alt .. " + TAB", hl.dsp.exec_cmd(noctalia .. "window-switcher hold"))
 
 -- wm
-hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd(terminal))
+hl.bind(mod .. " + RETURN", focus_or_spawn("kitty", terminal))
+hl.bind(mod .. " + BackSpace", focus_or_spawn("firefox", "firefox"))
+hl.bind(mod .. " + equal", focus_or_spawn("discord", "discord"))
 hl.bind(mod .. " + SHIFT + C", hl.dsp.window.close())
 hl.bind(mod .. " + SPACE", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
