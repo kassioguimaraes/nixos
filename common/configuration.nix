@@ -126,18 +126,17 @@
     defaultEditor = true;
   };
 
-  #file manager
-  # programs.thunar = {
-  #   enable = true;
-  #   plugins = with pkgs; [
-  #     thunar-archive-plugin
-  #     thunar-volman
-  #     thunar-media-tags-plugin
-  #   ];
-  # };
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs; [
+      thunar-archive-plugin
+      thunar-volman
+      thunar-media-tags-plugin
+    ];
+  };
 
-  # services.gvfs.enable = true;
-  # services.tumbler.enable = true;
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
   # Allow unfree packages and selected insecure packages needed by desktop apps.
   nixpkgs.config = {
     allowUnfree = true;

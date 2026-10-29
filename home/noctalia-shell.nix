@@ -12,6 +12,7 @@
   ];
   programs.noctalia = {
     enable = true;
+    systemd.enable = true;
     # Noctalia 5 config: stock bar plus a taskbar of the active workspace
     settings = {
       bar.default = {

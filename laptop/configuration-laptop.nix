@@ -7,14 +7,18 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.initrd.luks.devices."luks-eeb10580-8745-4323-a1a3-8008d9881ed2".device = "/dev/disk/by-uuid/eeb10580-8745-4323-a1a3-8008d9881ed2";
 
-  security.pam.services.kassio.enableGnomeKeyring = true;
+  # Provides the Secret Service used by Nextcloud and other applications.
+  # GDM uses the login PAM keyring hook enabled by this service.
   services.gnome.gnome-keyring.enable = true;
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "kassio";
+
+  services.displayManager = {
+    gdm.enable = true;
+    autoLogin = {
+      enable = true;
+      user = "kassio";
+    };
   };
+  programs.hyprland.enable = true;
   networking.hostName = "workpc";
   networking.wireless.enable = true;
 
