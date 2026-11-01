@@ -64,7 +64,7 @@
   #theming
   stylix = {
     image = pkgs.runCommand "dimmed-wallpaper.png" { } ''
-      ${lib.getExe' pkgs.imagemagick "magick"} "${../home/assets/wallpapers/wall9.jpg}" -brightness-contrast 0,0 "$out"
+      ${lib.getExe' pkgs.imagemagick "magick"} "${../home/assets/wallpapers/gr.jpg}" -brightness-contrast 0,0 "$out"
     '';
     polarity = "dark";
     fonts.sizes.terminal = 14;

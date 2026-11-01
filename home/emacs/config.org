@@ -41,19 +41,6 @@ Ports of the nixvim editing plugins and options.
                 tab-width 4)
 #+end_src
 
-** Escape with jk / kj
-Replaces easyescape. Both orders work, typed quickly.
-#+begin_src emacs-lisp
-  (use-package evil-escape
-    :after evil
-    :custom
-    (evil-escape-key-sequence "jk")
-    (evil-escape-unordered-key-sequence t)
-    (evil-escape-delay 0.1)
-    :config
-    (evil-escape-mode 1))
-#+end_src
-
 ** Surround
 =ys=, =cs=, =ds=, and =S= in visual state, like vim-surround.
 #+begin_src emacs-lisp
@@ -628,6 +615,14 @@ sessions keep Ghostel's semi-char mode because their integration needs the
     (ghostel-initial-input-mode 'char)
     :hook (ghostel-mode . (lambda () (display-line-numbers-mode -1)))
     :config
+    ;; Ghostel is a focused terminal workspace: do not leave it sharing a
+    ;; tiled Emacs frame with other buffers.
+    (defun my/ghostel-full-window (original-function &rest args)
+      "Show Ghostel as the only window in the selected frame."
+      (delete-other-windows)
+      (apply original-function args))
+    (advice-add 'ghostel :around #'my/ghostel-full-window)
+
     ;; Keep F8 as the way out in either terminal input mode.
     (keymap-set ghostel-char-mode-map "<f8>" #'previous-buffer)
     (keymap-set ghostel-semi-char-mode-map "<f8>" #'previous-buffer))
@@ -646,6 +641,30 @@ Not on MELPA, so it is installed straight from git.
 #+end_src
 
 * Interface
+** Dashboard
+Show a simple start screen without icon, font, or Projectile dependencies.
+Recent files and bookmarks use Emacs's built-in facilities.
+#+begin_src emacs-lisp
+  (use-package page-break-lines
+    :demand t)
+
+  (use-package dashboard
+    :init
+    (setq initial-buffer-choice (lambda () (get-buffer-create dashboard-buffer-name))
+          dashboard-startup-banner 'official
+          dashboard-banner-logo-title "Welcome to Emacs"
+          dashboard-center-content t
+          dashboard-show-shortcuts nil
+          dashboard-set-heading-icons nil
+          dashboard-set-file-icons nil
+          dashboard-items '((recents . 8)
+                            (bookmarks . 5)))
+    :config
+    (recentf-mode 1)
+    (dashboard-setup-startup-hook)
+    (add-hook 'dashboard-mode-hook #'page-break-lines-mode))
+#+end_src
+
 ** Theme fix: gnus face cycle
 Emacs 31 makes =gnus-group-news-N= inherit =gnus-group-news-N-empty=, while
 base16-theme (used by Stylix) makes the =-empty= faces inherit the other way.
