@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   imports = [
     ./hardware-configuration-desktop.nix
@@ -33,8 +33,9 @@
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
   programs.hyprland.enable = true;
+  services.xserver.windowManager.dwm.enable = true;
 
-  # Keep the DualShock 4 touchpad from controlling the Plasma cursor while
+  # Keep the DualShock 4 touchpad from controlling the cursor while
   # preserving the controller itself for games.
   services.udev.extraRules = ''
     SUBSYSTEM=="input", KERNEL=="event*", \
@@ -62,7 +63,9 @@
 
   #theming
   stylix = {
-    image = ../home/assets/wallpapers/gr.jpg;
+    image = pkgs.runCommand "dimmed-wallpaper.png" { } ''
+      ${lib.getExe' pkgs.imagemagick "magick"} "${../home/assets/wallpapers/wall9.jpg}" -brightness-contrast 0,0 "$out"
+    '';
     polarity = "dark";
     fonts.sizes.terminal = 14;
     icons = {

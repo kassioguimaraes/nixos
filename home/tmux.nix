@@ -74,6 +74,13 @@ bind -T copy-mode-vi y send -X copy-pipe "xclip -selection c"
 #auto reorder
 set-option -g renumber-windows on
 
+# Give newly created project sessions the same initial layout as general.  The
+# general session is bootstrapped by Fish instead, so it is deliberately exempt.
+set-hook -g session-created 'if-shell -F "#{!=:#{hook_session_name},general}" "new-window -d -t :2 -n window2"'
+set-hook -ag session-created 'if-shell -F "#{!=:#{hook_session_name},general}" "new-window -d -t :3 -n window3"'
+set-hook -ag session-created 'if-shell -F "#{!=:#{hook_session_name},general}" "new-window -d -t :4 -n window4"'
+set-hook -ag session-created 'if-shell -F "#{!=:#{hook_session_name},general}" "new-window -d -t :5 -n window5"'
+
 
 # Split horizontally on the first split, and vertically on subsequent splits
 bind-key -n M-n if-shell "test $(tmux list-panes | wc -l) -eq 1" "split-window -h" "split-window -v"
@@ -95,15 +102,20 @@ bind-key -n M-l resize-pane -R 5
 bind-key -T prefix C-l select-pane -R
 bind-key -n M-j select-pane -t :.+
 bind-key -n M-k select-pane -t :.-
-# Switch to the adjacent tmux window without wrapping at either end.
-bind-key -n M-q if-shell -F '#{==:#{window_index},1}' 'run-shell true' 'select-window -t :-'
-bind-key -n M-e if-shell -F '#{==:#{window_index},#{session_windows}}' 'run-shell true' 'select-window -t :+'
+# DWM-style direct window selection. Window numbering starts at 1.
+bind-key -n M-1 select-window -t :1
+bind-key -n M-2 select-window -t :2
+bind-key -n M-3 select-window -t :3
+bind-key -n M-4 select-window -t :4
+bind-key -n M-5 select-window -t :5
 # Show the session chooser (equivalent to the default prefix + s binding).
 bind-key -n M-w choose-tree -Zs
 # Swap current pane with the first pane in the next window
 bind-key -n C-i swap-pane -s "$TMUX_PANE" -t 0
 # Close the current pane, except for pane 0
 bind-key -n M-c if-shell "test $(tmux display-message -p '#{pane_index}') -ne 1" "run 'tmux kill-pane'" "display-message 'Cannot close pane 1'"
+# Close the current window, but keep the session alive by preserving its last window.
+bind-key -n M-C if-shell -F '#{==:#{session_windows},1}' 'display-message "Cannot close the last window"' 'kill-window'
 unbind-key -n Tab
 
 # Set the colors for the highlighted and non-highlighted parts
@@ -114,12 +126,6 @@ set -g window-status-current-style 'bg=red,fg=black'
 # Customize the status-right and status-left options
 set -g status-left '#[bg=blue] #S #[default]'
 set -g status-right '#[bg=blue] #(date "+%H:%M") #[default]'
-# start 4
-new-session -n window1 -s mysession 'fish' \; \
-  new-window -n window2 'fish' \; \
-  new-window -n window3 'fish' \; \
-  new-window -n window4 'fish'
-
 bind Tab display-popup -E "tms"
 
 #titles

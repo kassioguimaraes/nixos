@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, lib, ... }: {
   imports = [
     ./hardware-configuration-laptop.nix
     ../common/gaming.nix
@@ -39,7 +39,9 @@
 
   stylix = {
     enable = true;
-    image = ../home/assets/wallpapers/wall2.jpg;
+    image = pkgs.runCommand "dimmed-wallpaper.png" { } ''
+      ${lib.getExe' pkgs.imagemagick "magick"} "${../home/assets/wallpapers/wall2.jpg}" -brightness-contrast -10,0 "$out"
+    '';
     polarity = "dark";
     fonts.sizes.terminal = 14;
 

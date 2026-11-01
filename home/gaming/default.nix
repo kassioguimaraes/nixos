@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   home.packages = with pkgs; [
     protonplus
@@ -18,4 +18,13 @@
     Terminal=false
     X-GNOME-Autostart-enabled=true
   '';
+
+  xdg.desktopEntries.steam-gamescope = {
+    name = "Steam (Gamescope)";
+    comment = "Run Steam Gamepad UI inside a Gamescope session";
+    icon = "steam";
+    exec = "${lib.getExe pkgs.gamescope} -W 1920 -H 1080 -r 144 -f -e --adaptive-sync -- steam -gamepadui";
+    terminal = false;
+    categories = [ "Game" ];
+  };
 }

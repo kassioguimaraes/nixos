@@ -9,7 +9,14 @@
       end
 
       if status is-interactive; and not set -q TMUX
-        tmux new-session -A -s general -c "$PWD"
+        if not tmux has-session -t general 2>/dev/null
+          tmux new-session -d -s general -n window1 -c "$PWD"
+          tmux new-window -d -t general:2 -n window2 -c "$PWD"
+          tmux new-window -d -t general:3 -n window3 -c "$PWD"
+          tmux new-window -d -t general:4 -n window4 -c "$PWD"
+          tmux new-window -d -t general:5 -n window5 -c "$PWD"
+        end
+        tmux attach-session -t general
       end
     '';
     shellAliases = {

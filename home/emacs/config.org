@@ -177,11 +177,13 @@ current directory outside a project.
 picked up on each switch, so new clones show up without visiting them first.
 #+begin_src emacs-lisp
   (defun my/switch-project ()
-    "Switch project, after registering the repos under ~/code."
+    "Choose a project, then find a file in it.
+Repos under ~/code are registered before prompting."
     (interactive)
     (let ((inhibit-message t))
       (project-remember-projects-under "~/code/"))
-    (call-interactively #'project-switch-project))
+    (let ((default-directory (project-prompt-project-dir "Find file in project: ")))
+      (project-find-file)))
 #+end_src
 
 * Code
@@ -494,7 +496,7 @@ Mirrors the nixvim which-key layout.
     "fu" '(vundo :which-key "Undo tree")
     "fg" '(consult-ripgrep :which-key "Grep files")
     "fb" '(consult-buffer :which-key "Switch buffer")
-    "fp" '(my/switch-project :which-key "Switch project")
+    "fp" '(my/switch-project :which-key "Find project file")
     "fP" '((lambda () (interactive) (dired "~/code/")) :which-key "Browse ~/code")
 
     "g"  '(:ignore t :which-key "Lsp")
@@ -556,6 +558,9 @@ Function keys and escape, same as nixvim's basemap and Telescope keys.
 The buffer is killed when the program exits, and pressing the key again while
 it is running just switches back to it.
 #+begin_src emacs-lisp
+  ;; Don't let C-SPC set the Emacs mark.
+  (global-unset-key (kbd "C-SPC"))
+
   (defun my/run-in-terminal (program)
     "Run PROGRAM in its own ghostel buffer, reusing it while it is alive."
     (let ((name (format "*%s*" program)))
@@ -609,26 +614,23 @@ it is running just switches back to it.
 Terminal emulator built on libghostty-vt. The native module is downloaded
 automatically the first time a terminal is opened.
 
-=F8= jumps back to the previous buffer from anywhere, including from inside a
-terminal in insert state. Ghostel forwards function keys to the terminal, so
-=F8= is added to its exceptions to let Emacs handle it.
+=F8= opens (or returns to) the default Ghostel terminal. Inside any Ghostel
+buffer, =F8= instead returns to the previous buffer. Regular Ghostel terminals
+start in char mode so every other key reaches the terminal. Claude Code
+sessions keep Ghostel's semi-char mode because their integration needs the
+=C-c C-x= prefix.
 #+begin_src emacs-lisp
-  (keymap-global-set "<f8>" #'previous-buffer)
+  (keymap-global-set "<f8>" #'ghostel)
 
   (use-package ghostel
     :custom
     (ghostel-module-auto-install 'download)
+    (ghostel-initial-input-mode 'char)
     :hook (ghostel-mode . (lambda () (display-line-numbers-mode -1)))
     :config
-    (customize-set-variable 'ghostel-keymap-exceptions
-                            (cons "<f8>" ghostel-keymap-exceptions)))
-#+end_src
-
-** Evil ghostel
-#+begin_src emacs-lisp
-  (use-package evil-ghostel
-    :after (ghostel evil)
-    :hook (ghostel-mode . evil-ghostel-mode))
+    ;; Keep F8 as the way out in either terminal input mode.
+    (keymap-set ghostel-char-mode-map "<f8>" #'previous-buffer)
+    (keymap-set ghostel-semi-char-mode-map "<f8>" #'previous-buffer))
 #+end_src
 
 * Claude Code
@@ -685,6 +687,7 @@ already a Nerd Font.
 
 ** Enable line numbers
 #+begin_src emacs-lisp
+  (setq display-line-numbers-type 'relative)
   (global-display-line-numbers-mode 1)
 #+end_src
 
