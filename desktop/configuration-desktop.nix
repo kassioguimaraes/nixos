@@ -10,6 +10,13 @@
   boot.initrd.luks.devices."luks-b2a5dc40-ccd0-420f-b2a6-fac62e8186fe".device =
     "/dev/disk/by-uuid/b2a5dc40-ccd0-420f-b2a6-fac62e8186fe";
 
+  # Unlock swap after root so a retried root passphrase reaches it through the
+  # keyring. In parallel, a wrong passphrase makes each volume prompt on its own.
+  boot.initrd.systemd.services."systemd-cryptsetup@luks\\x2db2a5dc40\\x2dccd0\\x2d420f\\x2db2a6\\x2dfac62e8186fe" = {
+    overrideStrategy = "asDropin";
+    after = [ "systemd-cryptsetup@luks\\x2d858832cb\\x2db17a\\x2d46c6\\x2daefd\\x2d5aa0783ae4b8.service" ];
+  };
+
   environment.etc."crypttab".text = ''
     steam-games /dev/disk/by-partlabel/steam /root/.secrets/steam.key luks
   '';
