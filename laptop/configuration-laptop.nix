@@ -40,7 +40,7 @@
   stylix = {
     enable = true;
     image = pkgs.runCommand "dimmed-wallpaper.png" { } ''
-      ${lib.getExe' pkgs.imagemagick "magick"} "${../home/assets/wallpapers/wall2.jpg}" -brightness-contrast -10,0 "$out"
+      ${lib.getExe' pkgs.imagemagick "magick"} "${../home/assets/wallpapers/wall2.jpg}" -brightness-contrast -3,0 "$out"
     '';
     polarity = "dark";
     fonts.sizes.terminal = 14;

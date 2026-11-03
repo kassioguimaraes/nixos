@@ -3,6 +3,19 @@
 
 #+begin_src emacs-lisp
   ;; -*- lexical-binding: t; -*-
+  ;; Keep these Ghostel variables dynamically bindable before the package loads.
+  (defvar ghostel-buffer-name)
+  (defvar ghostel-initial-input-mode)
+  (defvar ghostel-shell)
+#+end_src
+
+* Performance
+Keep regular allocations cheap, then collect garbage when Emacs is idle or
+loses focus.  LSP process output is read in larger chunks in the Eglot setup.
+#+begin_src emacs-lisp
+  (setq gc-cons-threshold (* 100 1024 1024))
+  (add-hook 'focus-out-hook #'garbage-collect)
+  (run-with-idle-timer 5 t #'garbage-collect)
 #+end_src
 
 * Evil
@@ -171,6 +184,19 @@ Repos under ~/code are registered before prompting."
       (project-remember-projects-under "~/code/"))
     (let ((default-directory (project-prompt-project-dir "Find file in project: ")))
       (project-find-file)))
+
+  (defun my/project-terminal-toggle ()
+    "Open the current project's unconfigured Fish terminal, or return from it."
+    (interactive)
+    (if (derived-mode-p 'ghostel-mode)
+        (switch-to-prev-buffer)
+      (delete-other-windows)
+      (let ((ghostel-shell
+             (list (or (executable-find "fish")
+                       (user-error "Fish is not available"))
+                   "--no-config"))
+            (ghostel-initial-input-mode 'semi-char))
+        (ghostel-project))))
 #+end_src
 
 * Code
@@ -468,11 +494,26 @@ win over mode maps such as dired and magit.
 ** Leader bindings
 Mirrors the nixvim which-key layout.
 #+begin_src emacs-lisp
+  (defun my/compile-prompt ()
+    "Prompt for a compilation command without pre-filling `make'."
+    (interactive)
+    (pop-to-buffer
+     (compile (read-shell-command "Compile command: " nil 'compile-history))))
+
+  (defun my/recompile ()
+    "Recompile and select the compilation buffer."
+    (interactive)
+    (pop-to-buffer (recompile)))
+
   (my/leader
     "x" '(execute-extended-command :which-key "Command")
     "q" '(save-buffers-kill-terminal :which-key "Quit")
     "s" '(consult-line :which-key "Search buffer")
-    "." '(ghostel :which-key "Terminal")
+    "." '(my/project-terminal-toggle :which-key "Project terminal")
+
+    "r"  '(:ignore t :which-key "Run")
+    "rc" '(my/compile-prompt :which-key "Compile")
+    "rr" '(my/recompile :which-key "Recompile")
 
     "f"  '(:ignore t :which-key "Files")
     "fF" '(consult-fd :which-key "Find files")
@@ -601,13 +642,21 @@ it is running just switches back to it.
 Terminal emulator built on libghostty-vt. The native module is downloaded
 automatically the first time a terminal is opened.
 
-=F8= opens (or returns to) the default Ghostel terminal. Inside any Ghostel
-buffer, =F8= instead returns to the previous buffer. Regular Ghostel terminals
-start in char mode so every other key reaches the terminal. Claude Code
-sessions keep Ghostel's semi-char mode because their integration needs the
-=C-c C-x= prefix.
+=F8= opens (or returns to) the dedicated =*main-terminal*= Ghostel buffer,
+which uses the normal Fish startup and therefore attaches to the =general=
+tmux session. =SPC .= opens project-scoped Ghostel terminals with Fish's
+=--no-config= option instead.
+Inside any Ghostel buffer, =F8= returns to the previous buffer. The main
+terminal starts in char mode; project and Claude Code terminals use semi-char
+mode so Emacs can retain their control keys.
 #+begin_src emacs-lisp
-  (keymap-global-set "<f8>" #'ghostel)
+  (defun my/main-terminal ()
+    "Open or switch to the dedicated main Ghostel terminal."
+    (interactive)
+    (let ((ghostel-buffer-name "*main-terminal*"))
+      (ghostel)))
+
+  (keymap-global-set "<f8>" #'my/main-terminal)
 
   (use-package ghostel
     :custom

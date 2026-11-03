@@ -6,6 +6,7 @@
   # themselves are installed by use-package from config.org.
   programs.emacs = {
     enable = true;
+    package = pkgs.emacs-pgtk;
     # Prebuilt tree-sitter grammars, so nothing is compiled on first use
     extraPackages = epkgs: [ epkgs.treesit-grammars.with-all-grammars ];
     # vue-language-server 3 only works as a typescript-language-server
@@ -15,6 +16,10 @@
             "${pkgs.vue-language-server}/lib/language-tools/packages/typescript-plugin")
     '';
   };
+
+  # Run a persistent Emacs server as a systemd user service.  It starts with
+  # the user session and uses the package configured above.
+  services.emacs.enable = true;
 
   # Link straight to the repo (not the store) so config.org edits apply
   # without a rebuild and org-babel sees real mtimes when re-tangling.
