@@ -112,6 +112,21 @@ surround (=ys=, =cs=, =ds=).
     (interactive)
     (set-transient-map my/window-resize-map t)
     (message "Resize: h/j/k/l, any other key to stop"))
+
+  (defconst my/maximized-window-configuration-parameter
+    'my/maximized-window-configuration)
+
+  (defun my/toggle-maximize-window ()
+    "Maximize the selected window, or restore the previous frame layout."
+    (interactive)
+    (if-let ((configuration
+              (frame-parameter nil my/maximized-window-configuration-parameter)))
+        (progn
+          (set-window-configuration configuration)
+          (set-frame-parameter nil my/maximized-window-configuration-parameter nil))
+      (set-frame-parameter nil my/maximized-window-configuration-parameter
+                           (current-window-configuration))
+      (delete-other-windows)))
 #+end_src
 
 * Finding things
@@ -552,7 +567,7 @@ Mirrors the nixvim which-key layout.
     "wK" '(enlarge-window :which-key "Increase height")
     "wr" '(my/window-resize :which-key "Resize mode")
     "wi" '(window-swap-states :which-key "Swap window")
-    "wf" '(delete-other-windows :which-key "Close other windows")
+    "wf" '(my/toggle-maximize-window :which-key "Maximize window")
     "wd" '(delete-window :which-key "Close pane")
 
     "o"  '(:ignore t :which-key "Org mode")
