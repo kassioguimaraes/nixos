@@ -18,6 +18,13 @@ loses focus.  LSP process output is read in larger chunks in the Eglot setup.
   (run-with-idle-timer 5 t #'garbage-collect)
 #+end_src
 
+* Appearance
+Use an explicit height so direct Emacs and frames opened by the daemon do not
+depend on the display scale present when they start.
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil :height 140)
+#+end_src
+
 * Evil
 ** Evil mode
 =evil-want-keybinding= must be nil before evil loads, or evil-collection will complain.
@@ -649,7 +656,9 @@ it is running just switches back to it.
 ** Magit
 #+begin_src emacs-lisp
   (use-package magit
-    :commands magit-status)
+    :commands magit-status
+    :custom
+    (magit-stash-include-untracked t))
 #+end_src
 
 * Terminal
@@ -664,6 +673,7 @@ tmux session. =SPC .= opens project-scoped Ghostel terminals with Fish's
 Inside any Ghostel buffer, =F8= returns to the previous buffer. The main
 terminal starts in char mode; project and Claude Code terminals use semi-char
 mode so Emacs can retain their control keys.
+=Ctrl+Shift+V= pastes the desktop clipboard into either kind of terminal.
 #+begin_src emacs-lisp
   (defun my/main-terminal ()
     "Open or switch to the dedicated main Ghostel terminal."
@@ -689,7 +699,14 @@ mode so Emacs can retain their control keys.
 
     ;; Keep F8 as the way out in either terminal input mode.
     (keymap-set ghostel-char-mode-map "<f8>" #'previous-buffer)
-    (keymap-set ghostel-semi-char-mode-map "<f8>" #'previous-buffer))
+    (keymap-set ghostel-semi-char-mode-map "<f8>" #'previous-buffer)
+
+    ;; Character mode sends ordinary keys straight to the terminal, so bind
+    ;; the desktop paste shortcut explicitly in both input-mode maps.
+    ;; `ghostel-paste' refreshes Emacs's clipboard-backed kill ring and sends
+    ;; the text using the terminal's bracketed-paste protocol.
+    (keymap-set ghostel-char-mode-map "C-S-v" #'ghostel-paste)
+    (keymap-set ghostel-semi-char-mode-map "C-S-v" #'ghostel-paste))
 #+end_src
 
 * Claude Code
