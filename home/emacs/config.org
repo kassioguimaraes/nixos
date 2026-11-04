@@ -769,16 +769,13 @@ before gnus defines these faces; the theme still styles them.
 #+end_src
 
 ** Modeline
-Replaces lualine. Icons come from the Stylix monospace font, which is
-already a Nerd Font.
+Replaces lualine with a plain-text modeline.
 #+begin_src emacs-lisp
-  (use-package nerd-icons
-    :custom
-    (nerd-icons-font-family "FantasqueSansM Nerd Font"))
-
   (use-package doom-modeline
     :demand t
     :custom
+    (doom-modeline-icon nil)
+    (doom-modeline-major-mode-icon nil)
     (doom-modeline-buffer-file-name-style 'relative-from-project)
     (doom-modeline-buffer-encoding nil)
     :config
