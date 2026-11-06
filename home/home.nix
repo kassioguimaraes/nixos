@@ -10,6 +10,7 @@
   # User packages
   home.packages = with pkgs; [
     bitwarden-desktop
+    zathura
     kew
     bisq2
     gitMinimal
