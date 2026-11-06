@@ -39,7 +39,10 @@ depend on the display scale present when they start.
           evil-shift-width 4
           evil-ex-search-case 'smart)
     :config
-    (evil-mode 1))
+    (evil-mode 1)
+    ;; Evil normally uses C-v for `quoted-insert' in Insert state.  Use the
+    ;; desktop clipboard instead, so clipboard-manager paste works normally.
+    (keymap-set evil-insert-state-map "C-v" #'clipboard-yank))
 #+end_src
 
 ** Evil collection
@@ -326,6 +329,7 @@ Replaces blink-cmp: popup while typing, nothing preselected, =TAB= /
                 ("S-TAB" . corfu-previous)
                 ([backtab] . corfu-previous)
                 ("RET" . corfu-insert)
+                ("(" . corfu-insert)
                 ("C-e" . corfu-quit)
                 ("C-d" . corfu-popupinfo-toggle)
                 ("C-j" . corfu-popupinfo-scroll-up)
@@ -421,15 +425,17 @@ the saved package, so results refresh on save.
 #+end_src
 
 ** Docs
-=SPC g h= opens docs in a popup (lspsaga hover); nothing shows in the echo
-area on its own.
+=SPC g h= opens docs on demand. In LSP buffers, signature help also appears
+beside point while typing a call, including the active argument.
 #+begin_src emacs-lisp
   ;; Keep eldoc running (it fills the *eldoc* buffer SPC g h reads from) but
-  ;; don't print signatures/docs in the echo area when point moves.
+  ;; don't print signatures/docs in the echo area when point moves.  Eglot
+  ;; buffers use eldoc-box below instead.
   (setq eldoc-display-functions '(eldoc-display-in-buffer))
 
   (use-package eldoc-box
-    :commands eldoc-box-help-at-point)
+    :commands eldoc-box-help-at-point
+    :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
 #+end_src
 
 ** Formatting
@@ -538,7 +544,7 @@ Mirrors the nixvim which-key layout.
     "rr" '(my/recompile :which-key "Recompile")
 
     "f"  '(:ignore t :which-key "Files")
-    "fF" '(consult-fd :which-key "Find files")
+    "fF" '(find-file :which-key "Find file")
     "fe" '(dired-jump :which-key "Explorer")
     "fs" '(save-buffer :which-key "Save file")
     "ff" '(my/format-buffer :which-key "Format file")
@@ -831,6 +837,16 @@ file in the repo instead of asking every time.
   (setq make-backup-files nil
         auto-save-default nil
         create-lockfiles nil)
+#+end_src
+
+** Reload files changed outside Emacs
+Keep open buffers in sync when tools such as Claude or Codex write their files
+directly. Buffers with unsaved Emacs edits are never reverted automatically.
+#+begin_src emacs-lisp
+  (setq auto-revert-use-notify t
+        auto-revert-avoid-polling t
+        auto-revert-check-vc-info nil)
+  (global-auto-revert-mode 1)
 #+end_src
 
 ** Enable copypasting outside of Emacs
