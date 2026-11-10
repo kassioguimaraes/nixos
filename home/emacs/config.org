@@ -25,6 +25,26 @@ depend on the display scale present when they start.
   (set-face-attribute 'default nil :height 140)
 #+end_src
 
+** Org style
+=org-modern= replaces the older =org-bullets= and =org-superstar= packages.
+It gives headings and lists distinct bullets, and also gently styles the rest
+of an Org buffer without changing its underlying text.
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :after org
+    :hook ((org-mode . org-modern-mode)
+           (org-agenda-finalize . org-modern-agenda))
+    :custom
+    (org-modern-star 'replace)
+    (org-modern-replace-stars '("◉" "○" "◈" "◇" "✳"))
+    (org-modern-list '((?+ . "◦")
+                       (?- . "–")
+                       (?* . "•")))
+    (org-hide-emphasis-markers t)
+    (org-pretty-entities t)
+    (org-ellipsis "…"))
+#+end_src
+
 * Evil
 ** Evil mode
 =evil-want-keybinding= must be nil before evil loads, or evil-collection will complain.
