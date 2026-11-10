@@ -10,10 +10,14 @@
     # Prebuilt tree-sitter grammars, so nothing is compiled on first use
     extraPackages = epkgs: [ epkgs.treesit-grammars.with-all-grammars ];
     # vue-language-server 3 only works as a typescript-language-server
-    # plugin; config.org points eglot at it for .vue files.
+    # plugin; config.org points eglot at it for .vue files.  Emureader
+    # builds a native module at runtime, so also provide MuPDF's headers
+    # and shared-library location to that build.
     extraConfig = ''
       (setq my/vue-typescript-plugin
-            "${pkgs.vue-language-server}/lib/language-tools/packages/typescript-plugin")
+            "${pkgs.vue-language-server}/lib/language-tools/packages/typescript-plugin"
+            my/mupdf-include-directory "${pkgs.mupdf.dev}/include"
+            my/mupdf-library-directory "${pkgs.mupdf.out}/lib")
     '';
   };
 
@@ -43,6 +47,13 @@
     intelephense
     vscode-langservers-extracted # html, json, css
     yaml-language-server
+    tinymist # Typst language server
+
+    # Document typesetting
+    typst
+
+    # Native backend for the Emureader document viewer
+    mupdf
 
     # Formatters and linters
     nixfmt

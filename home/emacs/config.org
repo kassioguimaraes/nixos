@@ -250,6 +250,27 @@ Separate mode names let eglot pick the right server for each.
     (define-derived-mode svelte-mode web-mode "Svelte"))
 #+end_src
 
+** Typst
+Typst source files use =typst-ts-mode= and automatically connect to Tinymist
+through Eglot.  Tinymist is the installed language server; the downloaded
+server path and =typst-lsp= remain fallbacks for systems where it is absent.
+#+begin_src emacs-lisp
+  (use-package typst-ts-mode
+    ;; The GNU/nonGNU ELPA archive entry for 0.12.2 is stale; install the
+    ;; maintained upstream mode directly instead.
+    :vc (:url "https://codeberg.org/meow_king/typst-ts-mode" :rev :newest)
+    :mode "\\.typ\\'"
+    :hook (typst-ts-mode . eglot-ensure))
+
+  (with-eval-after-load 'eglot
+    (with-eval-after-load 'typst-ts-mode
+      (add-to-list 'eglot-server-programs
+                   `((typst-ts-mode) .
+                     ,(eglot-alternatives `(,typst-ts-lsp-download-path
+                                            "tinymist"
+                                            "typst-lsp"))))))
+#+end_src
+
 ** Trusted content
 Emacs 30+ only runs code-executing checkers (eglot's flymake backend
 included) in trusted files. Without this, flymake disables eglot's backend
@@ -329,7 +350,6 @@ Replaces blink-cmp: popup while typing, nothing preselected, =TAB= /
                 ("S-TAB" . corfu-previous)
                 ([backtab] . corfu-previous)
                 ("RET" . corfu-insert)
-                ("(" . corfu-insert)
                 ("C-e" . corfu-quit)
                 ("C-d" . corfu-popupinfo-toggle)
                 ("C-j" . corfu-popupinfo-scroll-up)
@@ -438,6 +458,60 @@ beside point while typing a call, including the active argument.
     :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
 #+end_src
 
+** Document reader
+Emureader is installed from GNU ELPA by =use-package= and uses the MuPDF
+backend supplied by Nix.  Its first opened document prompts to build a native
+module; add Nix's MuPDF headers and libraries to that build environment. Keep
+its defaults and only add Vim-style reading keys.
+#+begin_src emacs-lisp
+  (defvar my/mupdf-include-directory nil
+    "Nix MuPDF include directory, set from emacs.nix.")
+  (defvar my/mupdf-library-directory nil
+    "Nix MuPDF library directory, set from emacs.nix.")
+
+  (use-package emureader
+    :init
+    (dolist (entry (list (cons "C_INCLUDE_PATH" my/mupdf-include-directory)
+                         (cons "LIBRARY_PATH" my/mupdf-library-directory)
+                         (cons "LD_LIBRARY_PATH" my/mupdf-library-directory)))
+      (when-let ((directory (cdr entry)))
+        (setenv (car entry)
+                (if-let ((current (getenv (car entry))))
+                    (concat directory path-separator current)
+                  directory))))
+    :config
+    ;; Emureader invokes make asynchronously.  Give that exact compilation
+    ;; process the Nix paths as well, so a server started before a rebuild
+    ;; cannot lose the MuPDF headers or libraries.
+    (defun my/emureader-build-with-nix-mupdf (build &rest args)
+      (let ((compilation-environment
+             (append
+              (delq nil
+                    (list
+                     (and my/mupdf-include-directory
+                          (concat "C_INCLUDE_PATH=" my/mupdf-include-directory))
+                     (and my/mupdf-include-directory
+                          (concat "CFLAGS=-I" my/mupdf-include-directory))
+                     (and my/mupdf-library-directory
+                          (concat "LIBRARY_PATH=" my/mupdf-library-directory))
+                     (and my/mupdf-library-directory
+                          (concat "LD_LIBRARY_PATH=" my/mupdf-library-directory))))
+              compilation-environment)))
+        (apply build args)))
+
+    (advice-add 'emureader-build :around #'my/emureader-build-with-nix-mupdf)
+    (evil-define-key 'normal emureader-mode-map (kbd "q")
+      #'my/emureader-quit-window)
+    :bind (:map emureader-mode-map
+                ("h" . emureader-previous-page)
+                ("l" . emureader-next-page)
+                ("j" . emureader-scroll-down-or-next-page)
+                ("k" . emureader-scroll-up-or-prev-page)
+                ("0" . emureader-first-page)
+                ("$" . emureader-last-page)
+                ("q" . my/emureader-quit-window)))
+#+end_src
+
 ** Formatting
 =SPC f f= formats like none-ls did: nixfmt for Nix, black for Python, the
 language server for everything else, then rustywind sorts Tailwind classes in
@@ -533,6 +607,89 @@ Mirrors the nixvim which-key layout.
     (interactive)
     (pop-to-buffer (recompile)))
 
+  (defun my/typst-output-file ()
+    "Return the PDF output path for the current Typst buffer."
+    (unless buffer-file-name
+      (user-error "This Typst buffer is not visiting a file"))
+    (concat (file-name-sans-extension buffer-file-name) ".pdf"))
+
+  (defun my/typst-build ()
+    "Save and compile the current Typst file to PDF."
+    (interactive)
+    (unless (derived-mode-p 'typst-ts-mode)
+      (user-error "This command is only available in a Typst buffer"))
+    (save-buffer)
+    (let* ((source buffer-file-name)
+           (output (my/typst-output-file))
+           (build-buffer (get-buffer-create "*Typst Build*"))
+           (exit-code (with-current-buffer build-buffer
+                        (erase-buffer)
+                        (call-process "typst" nil t nil "compile" source output))))
+      (if (zerop exit-code)
+          (progn
+            (message "Built %s" output)
+            output)
+        (pop-to-buffer build-buffer)
+        (user-error "Typst build failed"))))
+
+  (defun my/emureader-open-in-vertical-split (file)
+    "Open FILE in Emureader in a vertical split to the right."
+    ;; Emureader's public open command assumes its MuPDF module is loaded.
+    ;; Ensure it here because opening a generated PDF bypasses Emureader's
+    ;; usual interactive entry point.
+    (emureader-ensure-module)
+    (if (featurep 'emureader-dyn)
+        (progn
+          (select-window (split-window-right))
+          (emureader-open-doc file))
+      (message "Emureader is building its native module; try again when it finishes")))
+
+  (defun my/emureader-quit-window ()
+    "Close the Emureader buffer and its preview split."
+    (interactive)
+    (let ((window (selected-window))
+          (buffer (current-buffer)))
+      (when (> (length (window-list)) 1)
+        (delete-window window))
+      (when (buffer-live-p buffer)
+        (kill-buffer buffer))))
+
+  (defun my/typst-build-and-preview ()
+    "Build the current Typst file and open its PDF in Emureader."
+    (interactive)
+    (my/emureader-open-in-vertical-split (my/typst-build)))
+
+  (defun my/dired-open-in-emureader ()
+    "Open the Dired file at point in Emureader in a vertical split."
+    (interactive)
+    (let ((file (dired-get-file-for-visit)))
+      (when (file-directory-p file)
+        (user-error "Select a document, not a directory"))
+      (my/emureader-open-in-vertical-split file)))
+
+  (with-eval-after-load 'dired
+    (keymap-set dired-mode-map "E" #'my/dired-open-in-emureader)
+    (evil-define-key 'normal dired-mode-map (kbd "E")
+      #'my/dired-open-in-emureader))
+
+  (defun my/typst-escape-content (text)
+    "Escape TEXT for a Typst content block."
+    (mapconcat (lambda (char)
+                 (pcase char
+                   (?\\ "\\\\")
+                   (?\[ "\\[")
+                   (?\] "\\]")
+                   (?# "\\#")
+                   (_ (char-to-string char))))
+               text ""))
+
+  (defun my/typst-insert-basic-document (title)
+    "Insert a basic A4 Typst document using TITLE."
+    (interactive (list (read-string "Document title: ")))
+    (insert (format "#set page(paper: \"a4\", margin: 2.5cm)\n#set text(font: \"Libertinus Serif\", size: 11pt)\n#set par(justify: true)\n#set heading(numbering: \"1.\")\n\n#show heading.where(level: 1): set text(\n  fill: rgb(\"#345a80\"),\n  size: 16pt,\n)\n\n#align(center)[\n  #text(size: 22pt, weight: \"bold\")[\n    %s\n  ]\n\n  %s\n]\n"
+                    (my/typst-escape-content title)
+                    (format-time-string "%d de %B de %Y"))))
+
   (my/leader
     "x" '(execute-extended-command :which-key "Command")
     "q" '(save-buffers-kill-terminal :which-key "Quit")
@@ -542,6 +699,13 @@ Mirrors the nixvim which-key layout.
     "r"  '(:ignore t :which-key "Run")
     "rc" '(my/compile-prompt :which-key "Compile")
     "rr" '(my/recompile :which-key "Recompile")
+
+    "D"  '(:ignore t :which-key "Typst document")
+    "Db" '(my/typst-build :which-key "Build document")
+    "Dp" '(my/typst-build-and-preview :which-key "Build and preview")
+    "De" '((lambda () (interactive) (dired "~/Documents/")) :which-key "Browse Documents")
+    "Ds"  '(:ignore t :which-key "Setup")
+    "Dsb" '(my/typst-insert-basic-document :which-key "Insert basic document")
 
     "f"  '(:ignore t :which-key "Files")
     "fF" '(find-file :which-key "Find file")
@@ -708,11 +872,17 @@ mode so Emacs can retain their control keys.
     (keymap-set ghostel-semi-char-mode-map "<f8>" #'previous-buffer)
 
     ;; Character mode sends ordinary keys straight to the terminal, so bind
-    ;; the desktop paste shortcut explicitly in both input-mode maps.
+    ;; desktop clipboard shortcuts explicitly in both input-mode maps.
+    (keymap-set ghostel-char-mode-map "C-S-c" #'ghostel-copy-mode)
     ;; `ghostel-paste' refreshes Emacs's clipboard-backed kill ring and sends
     ;; the text using the terminal's bracketed-paste protocol.
     (keymap-set ghostel-char-mode-map "C-S-v" #'ghostel-paste)
-    (keymap-set ghostel-semi-char-mode-map "C-S-v" #'ghostel-paste))
+    (keymap-set ghostel-semi-char-mode-map "C-S-v" #'ghostel-paste)
+
+    ;; In copy mode, RET copies the active selection.  Bind both spellings
+    ;; because GUI and terminal Emacs can report Return differently.
+    (keymap-set ghostel-readonly-mode-map "RET" #'ghostel-readonly-copy)
+    (keymap-set ghostel-readonly-mode-map "<return>" #'ghostel-readonly-copy))
 #+end_src
 
 * Claude Code

@@ -56,6 +56,8 @@ in
     laravel
     sshpass
     gnumake
+    vis
+    jq
     openapi-generator-cli
     vscode
     zed-editor-fhs
