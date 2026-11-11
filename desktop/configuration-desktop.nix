@@ -3,6 +3,7 @@
   imports = [
     ./hardware-configuration-desktop.nix
     ../common/gaming.nix
+    ./performance.nix
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

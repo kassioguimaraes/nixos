@@ -20,13 +20,15 @@
       url = "github:shezdy/hyprsplit";
       flake = false;
     };
+    # Don't make it follow nixpkgs: its patches are pinned to its own kernel version
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     stylix = {
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, aagl, stylix, home-manager, nixvim, ... }:
+  outputs = inputs@{ self, nixpkgs, aagl, stylix, home-manager, nixvim, nix-cachyos-kernel, ... }:
     let
       system = "x86_64-linux";
       # Shared modules for all hosts
@@ -60,6 +62,7 @@
           inherit system;
           modules = sharedModules ++ [
             ./desktop/configuration-desktop.nix
+            { nixpkgs.overlays = [ nix-cachyos-kernel.overlays.pinned ]; }
             { home-manager.users.kassio = import ./home/home-desktop.nix; }
 
           ];
