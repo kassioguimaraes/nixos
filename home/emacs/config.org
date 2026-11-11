@@ -40,10 +40,11 @@ directory.
 
 ** Discord Markdown export
 The stock Markdown exporter uses HTML for some constructs, such as
-strikethrough and tables.  Discord does not render that HTML, so provide a
-dedicated exporter which uses Discord's =~~strikethrough~~= syntax and renders
-tables as code blocks.  It also omits the export table of contents: Discord
-cannot use Org's generated anchor links.
+strikethrough and tables, and exports TODO headings as regular headings.
+Discord does not render that HTML, so provide a dedicated exporter which uses
+Discord's =~~strikethrough~~= syntax, renders tables as code blocks, and turns
+tasks into checkbox-style list items.  It also omits the export table of
+contents: Discord cannot use Org's generated anchor links.
 #+begin_src emacs-lisp
   (require 'ox-md)
   (defun my/org-discord-table (table _contents info)
@@ -67,14 +68,33 @@ cannot use Org's generated anchor links.
       "\n")
      "\n```\n"))
 
+  (defun my/org-discord-headline (headline contents info)
+    "Export HEADLINE using Discord headings or task list items."
+    (unless (org-element-property :footnote-section-p headline)
+      (let* ((title (org-export-data (org-element-property :title headline) info))
+             (todo (org-element-property :todo-keyword headline))
+             (done (eq (org-element-property :todo-type headline) 'done))
+             (priority (and (plist-get info :with-priority)
+                            (when-let ((value (org-element-property :priority headline)))
+                            (format "[#%s] " (org-priority-to-string value))))))
+        (if todo
+            (concat "- " (if done "✅" "☐") " " priority title "\n" contents)
+          ;; Use Org's literal level so ** becomes ##, even when exporting a
+          ;; subtree whose relative level would otherwise start at one.
+          (concat (make-string (org-element-property :level headline) ?#)
+                  " " priority title "\n\n" contents)))))
+
   (defun my/org-discord-filter-final-output (output backend _info)
     "Convert remaining Markdown-export HTML into Discord syntax."
     (if (eq backend 'discord)
-        (replace-regexp-in-string "</?del>" "~~" output)
+        (replace-regexp-in-string
+         "\n\n\\(- [✅☐]\\)" "\n\\1"
+         (replace-regexp-in-string "</?del>" "~~" output))
       output))
 
   (org-export-define-derived-backend 'discord 'md
-    :translate-alist '((table . my/org-discord-table))
+    :translate-alist '((headline . my/org-discord-headline)
+                       (table . my/org-discord-table))
     :options-alist '((:with-toc nil nil nil))
     :filters-alist '((:filter-final-output . my/org-discord-filter-final-output))
     :menu-entry
@@ -790,6 +810,7 @@ Mirrors the nixvim which-key layout.
                     (format-time-string "%d de %B de %Y"))))
 
   (my/leader
+    "SPC" 'dashboard-open
     "x" '(execute-extended-command :which-key "Command")
     "q" '(save-buffers-kill-terminal :which-key "Quit")
     "s" '(consult-line :which-key "Search buffer")
@@ -856,6 +877,7 @@ Mirrors the nixvim which-key layout.
     "ot" 'org-todo-list
     "oc" 'org-capture
     "oe" '((lambda () (interactive) (dired "~/org/")) :which-key "Browse ~/org")
+    "ox" '(org-export-dispatch :which-key "Export")
 
     "c"  '(:ignore t :which-key "Claude")
     "cc" '(claude-code-ide :which-key "Start session")
@@ -889,14 +911,22 @@ it is running just switches back to it.
   (global-unset-key (kbd "C-SPC"))
 
   (defun my/run-in-terminal (program)
-    "Run PROGRAM in its own ghostel buffer, reusing it while it is alive."
+    "Run PROGRAM in a char-mode Ghostel buffer, reusing it while alive."
     (let ((name (format "*%s*" program)))
       (if (get-buffer name)
           (switch-to-buffer name)
         (require 'ghostel)
         (let ((buf (get-buffer-create name)))
           (switch-to-buffer buf)
-          (ghostel-exec buf program)))))
+          ;; `ghostel-exec' does not use `ghostel-initial-input-mode'.
+          ;; Keep these TUIs in char mode, and dispose of the terminal once
+          ;; their process exits.
+          (let ((ghostel-kill-buffer-on-exit t))
+            (ghostel-exec buf program))
+          (when (buffer-live-p buf)
+            (with-current-buffer buf
+              (setq-local ghostel-kill-buffer-on-exit t)
+              (ghostel-char-mode)))))))
 
   (defun my/lazydocker () (interactive) (my/run-in-terminal "lazydocker"))
   (defun my/lazysql () (interactive) (my/run-in-terminal "lazysql"))
