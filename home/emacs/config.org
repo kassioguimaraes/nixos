@@ -25,6 +25,78 @@ depend on the display scale present when they start.
   (set-face-attribute 'default nil :height 140)
 #+end_src
 
+* Organization
+Keep Org files, agenda files, and captures rooted in the personal Org
+directory.
+#+begin_src emacs-lisp
+  (setq org-directory (expand-file-name "~/org/"))
+
+  ;; Make attachment commands available to leader bindings without loading
+  ;; org-attach until one is invoked.
+  (autoload 'org-attach-attach-cp "org-attach" nil t)
+  (autoload 'org-attach-url "org-attach" nil t)
+  (autoload 'org-attach-open "org-attach" nil t)
+#+end_src
+
+** Discord Markdown export
+The stock Markdown exporter uses HTML for some constructs, such as
+strikethrough and tables.  Discord does not render that HTML, so provide a
+dedicated exporter which uses Discord's =~~strikethrough~~= syntax and renders
+tables as code blocks.  It also omits the export table of contents: Discord
+cannot use Org's generated anchor links.
+#+begin_src emacs-lisp
+  (require 'ox-md)
+  (defun my/org-discord-table (table _contents info)
+    "Export TABLE as a Discord code block."
+    (concat
+     "\n```\n"
+     (mapconcat
+      #'identity
+      (delq nil
+            (mapcar
+             (lambda (row)
+               (unless (eq (org-element-property :type row) 'rule)
+                 (concat "| "
+                         (mapconcat
+                          (lambda (cell)
+                            (string-trim
+                             (org-export-data (org-element-contents cell) info)))
+                          (org-element-contents row) " | ")
+                         " |")))
+             (org-element-map table 'table-row #'identity)))
+      "\n")
+     "\n```\n"))
+
+  (defun my/org-discord-filter-final-output (output backend _info)
+    "Convert remaining Markdown-export HTML into Discord syntax."
+    (if (eq backend 'discord)
+        (replace-regexp-in-string "</?del>" "~~" output)
+      output))
+
+  (org-export-define-derived-backend 'discord 'md
+    :translate-alist '((table . my/org-discord-table))
+    :options-alist '((:with-toc nil nil nil))
+    :filters-alist '((:filter-final-output . my/org-discord-filter-final-output))
+    :menu-entry
+    '(?D "Export to Discord Markdown"
+         ((?D "To temporary buffer"
+              (lambda (a s v b)
+                (org-export-to-buffer 'discord "*Org Discord Markdown Export*"
+                  a s v b)))
+          (?d "To file"
+              (lambda (a s v b)
+                (org-export-to-file 'discord
+                  (org-export-output-file-name ".md" s) a s v b)))
+          (?o "To file and open"
+              (lambda (a s v b)
+                (if a
+                    (org-export-to-file 'discord
+                      (org-export-output-file-name ".md" s) t s v b)
+                  (org-open-file
+                   (org-export-to-file 'discord
+                     (org-export-output-file-name ".md" s) nil s v b))))))))
+#+end_src
+
 ** Org style
 =org-modern= replaces the older =org-bullets= and =org-superstar= packages.
 It gives headings and lists distinct bullets, and also gently styles the rest
@@ -489,6 +561,11 @@ its defaults and only add Vim-style reading keys.
   (defvar my/mupdf-library-directory nil
     "Nix MuPDF library directory, set from emacs.nix.")
 
+  (defun my/emureader-focus-window ()
+    "Focus the window showing the current Emureader buffer."
+    (when-let ((window (get-buffer-window (current-buffer) 0)))
+      (select-window window)))
+
   (use-package emureader
     :init
     (dolist (entry (list (cons "C_INCLUDE_PATH" my/mupdf-include-directory)
@@ -499,6 +576,8 @@ its defaults and only add Vim-style reading keys.
                 (if-let ((current (getenv (car entry))))
                     (concat directory path-separator current)
                   directory))))
+    :hook ((emureader-mode . (lambda () (display-line-numbers-mode -1)))
+           (emureader-mode . my/emureader-focus-window))
     :config
     ;; Emureader invokes make asynchronously.  Give that exact compilation
     ;; process the Nix paths as well, so a server started before a rebuild
@@ -520,8 +599,8 @@ its defaults and only add Vim-style reading keys.
         (apply build args)))
 
     (advice-add 'emureader-build :around #'my/emureader-build-with-nix-mupdf)
-    (evil-define-key 'normal emureader-mode-map (kbd "q")
-      #'my/emureader-quit-window)
+    ;; Keep Emureader's own mode map in control of its reading buffers.
+    (evil-set-initial-state 'emureader-mode 'emacs)
     :bind (:map emureader-mode-map
                 ("h" . emureader-previous-page)
                 ("l" . emureader-next-page)
@@ -728,10 +807,10 @@ Mirrors the nixvim which-key layout.
     "Dsb" '(my/typst-insert-basic-document :which-key "Insert basic document")
 
     "f"  '(:ignore t :which-key "Files")
-    "fF" '(find-file :which-key "Find file")
+    "ff" '(find-file :which-key "Find file")
     "fe" '(dired-jump :which-key "Explorer")
     "fs" '(save-buffer :which-key "Save file")
-    "ff" '(my/format-buffer :which-key "Format file")
+    "fF" '(my/format-buffer :which-key "Format file")
     "fd" '(kill-current-buffer :which-key "Close file")
     "fu" '(vundo :which-key "Undo tree")
     "fg" '(consult-ripgrep :which-key "Grep files")
@@ -768,7 +847,15 @@ Mirrors the nixvim which-key layout.
     "wd" '(delete-window :which-key "Close pane")
 
     "o"  '(:ignore t :which-key "Org mode")
-    "of" '((lambda () (interactive) (find-file "~/org/")) :which-key "Org files")
+    "of" '((lambda () (interactive) (ido-find-file-in-dir "~/org/")) :which-key "Org files")
+    "oa" 'org-agenda
+    "oA" '(:ignore t :which-key "Attachments")
+    "oAa" 'org-attach-attach-cp
+    "oAu" 'org-attach-url
+    "oAp" 'org-attach-open
+    "ot" 'org-todo-list
+    "oc" 'org-capture
+    "oe" '((lambda () (interactive) (dired "~/org/")) :which-key "Browse ~/org")
 
     "c"  '(:ignore t :which-key "Claude")
     "cc" '(claude-code-ide :which-key "Start session")
