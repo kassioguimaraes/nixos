@@ -352,7 +352,7 @@ grammar to its tree-sitter mode.
 
 ** Vue and Svelte
 No tree-sitter modes for these, so they get thin modes on top of web-mode.
-Separate mode names let eglot pick the right server for each.
+Separate mode names keep their language-server hooks independent.
 #+begin_src emacs-lisp
   (use-package web-mode
     :mode (("\\.vue\\'" . vue-mode)
@@ -392,29 +392,15 @@ and no errors show. Add other directories here if you code outside ~/code.
 #+end_src
 
 ** Eglot
-Starts automatically for every language below. Most servers are eglot's
-defaults; the rest are listed explicitly.
-
-vue-language-server 3 only works as a plugin of typescript-language-server,
-so =.vue= files run that with the plugin (path set by =emacs.nix=). Script
-blocks get full TypeScript support; templates don't.
+Starts automatically for every language below except Vue.  Most servers
+are Eglot's defaults; the rest are listed explicitly.  Vue uses lsp-mode
+below because it needs two cooperating language servers.
 #+begin_src emacs-lisp
-  (defvar my/vue-typescript-plugin nil
-    "Path to @vue/typescript-plugin, set from emacs.nix.")
-
-  (defun my/vue-eglot-contact (&rest _)
-    "typescript-language-server with the Vue plugin."
-    `("typescript-language-server" "--stdio"
-      :initializationOptions
-      (:plugins [(:name "@vue/typescript-plugin"
-                  :location ,my/vue-typescript-plugin
-                  :languages ["vue"])])))
-
   (use-package eglot
     :ensure nil
     :hook ((rust-ts-mode go-ts-mode python-ts-mode
             typescript-ts-mode tsx-ts-mode js-ts-mode
-            vue-mode svelte-mode html-ts-mode mhtml-ts-mode mhtml-mode
+            svelte-mode html-ts-mode mhtml-ts-mode mhtml-mode
             php-ts-mode nix-ts-mode json-ts-mode yaml-ts-mode)
            . eglot-ensure)
     :commands (eglot-rename eglot-code-actions eglot-format-buffer)
@@ -436,9 +422,48 @@ blocks get full TypeScript support; templates don't.
                       (python-ts-mode . ("pyright-langserver" "--stdio"))
                       (svelte-mode . ("svelteserver" "--stdio"))
                       ((html-ts-mode mhtml-ts-mode mhtml-mode)
-                       . ("vscode-html-language-server" "--stdio"))
-                      (vue-mode . my/vue-eglot-contact)))
+                       . ("vscode-html-language-server" "--stdio"))))
       (add-to-list 'eglot-server-programs server)))
+#+end_src
+
+** Vue LSP
+Only Vue uses lsp-mode.  Its Volar client runs alongside TypeScript and
+forwards Vue's TypeScript requests.  The small compatibility module handles
+the newer bridge message format and Nix package paths.  Diagnostics still
+use Flymake, and completion still uses Corfu.
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :pin melpa
+    :hook (vue-mode . my/vue-lsp-start)
+    :commands (lsp-rename lsp-execute-code-action lsp-format-buffer)
+    :custom
+    (lsp-completion-provider :none)
+    (lsp-diagnostics-provider :flymake)
+    (lsp-auto-guess-root t)
+    ;; TypeScript watches its own project; avoid scanning Laravel's vendor tree.
+    (lsp-enable-file-watchers nil)
+    (lsp-headerline-breadcrumb-enable nil)
+    (lsp-lens-enable nil)
+    (lsp-enable-on-type-formatting nil)
+    (lsp-enable-symbol-highlighting nil)
+    (lsp-modeline-code-actions-enable nil)
+    (lsp-modeline-diagnostics-enable nil)
+    (lsp-log-io nil)
+    (lsp-idle-delay 0.5)
+    :init
+    (defun my/vue-lsp-start ()
+      "Start the cooperating Vue and TypeScript servers only for Vue."
+      (require 'lsp-mode)
+      (setq-local lsp-enabled-clients '(ts-ls vue-semantic-server))
+      (lsp-deferred))
+    ;; Make re-evaluating the config safe after the previous Eglot setup.
+    (remove-hook 'vue-mode-hook #'eglot-ensure)
+    :config
+    (load (expand-file-name
+           "vue-lsp.el"
+           (file-name-directory
+            (file-truename (expand-file-name "config.org" user-emacs-directory))))
+          nil 'nomessage))
 #+end_src
 
 ** Completion
@@ -484,6 +509,17 @@ Words from open buffers are mixed into the LSP results, like blink's
                   (list (cape-capf-super #'eglot-completion-at-point
                                          #'cape-dabbrev))))
     (add-hook 'eglot-managed-mode-hook #'my/eglot-capf))
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun my/vue-lsp-capf ()
+    (when (and (derived-mode-p 'vue-mode) lsp-completion-mode)
+      (setq-local completion-at-point-functions
+                  (list (cape-capf-super #'lsp-completion-at-point
+                                         #'cape-dabbrev)))))
+
+  (with-eval-after-load 'lsp-completion
+    (add-hook 'lsp-completion-mode-hook #'my/vue-lsp-capf))
 #+end_src
 
 Expands the snippets that language servers send (luasnip's job in nvim).
@@ -567,7 +603,8 @@ beside point while typing a call, including the active argument.
 
   (use-package eldoc-box
     :commands eldoc-box-help-at-point
-    :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode))
+    :hook ((eglot-managed-mode . eldoc-box-hover-at-point-mode)
+           (lsp-managed-mode . eldoc-box-hover-at-point-mode)))
 #+end_src
 
 ** Document reader
@@ -656,10 +693,14 @@ web files. Nothing formats on save.
     (interactive)
     (if-let* ((formatter (alist-get major-mode my/formatters)))
         (apheleia-format-buffer formatter)
-      (if (and (fboundp 'eglot-managed-p) (eglot-managed-p)
-               (eglot-server-capable :documentFormattingProvider))
-          (eglot-format-buffer)
-        (message "No formatter for %s" major-mode))
+      (cond
+       ((and (bound-and-true-p lsp-mode)
+             (lsp-feature? "textDocument/formatting"))
+        (lsp-format-buffer))
+       ((and (fboundp 'eglot-managed-p) (eglot-managed-p)
+             (eglot-server-capable :documentFormattingProvider))
+        (eglot-format-buffer))
+       (t (message "No formatter for %s" major-mode)))
       (when (memq major-mode my/tailwind-modes)
         (apheleia-format-buffer 'rustywind))))
 #+end_src
@@ -844,8 +885,14 @@ Mirrors the nixvim which-key layout.
     "gh" '(eldoc-box-help-at-point :which-key "Show documentation")
     "gf" '(xref-find-references :which-key "Find references")
     "go" '(consult-imenu :which-key "Outline")
-    "gr" '(eglot-rename :which-key "Rename symbol")
-    "ga" '(eglot-code-actions :which-key "Code actions")
+    "gr" '((lambda () (interactive)
+             (call-interactively (if (bound-and-true-p lsp-mode)
+                                     #'lsp-rename #'eglot-rename)))
+           :which-key "Rename symbol")
+    "ga" '((lambda () (interactive)
+             (call-interactively (if (bound-and-true-p lsp-mode)
+                                     #'lsp-execute-code-action #'eglot-code-actions)))
+           :which-key "Code actions")
     "ge" '(flymake-show-buffer-diagnostics :which-key "File errors")
     "gE" '(flymake-show-project-diagnostics :which-key "Project errors")
     "gn" '(flymake-goto-next-error :which-key "Next error")

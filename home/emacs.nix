@@ -9,8 +9,8 @@
     package = pkgs.emacs-pgtk;
     # Prebuilt tree-sitter grammars, so nothing is compiled on first use
     extraPackages = epkgs: [ epkgs.treesit-grammars.with-all-grammars ];
-    # vue-language-server 3 only works as a typescript-language-server
-    # plugin; config.org points eglot at it for .vue files.  Emureader
+    # Vue's lsp-mode bridge uses this path to find the matching server
+    # and TypeScript plugin from the same Nix package.  Emureader
     # builds a native module at runtime, so also provide MuPDF's headers
     # and shared-library location to that build.
     extraConfig = ''
