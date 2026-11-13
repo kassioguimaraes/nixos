@@ -6,6 +6,7 @@
     antimicrox
     pulseaudio
     thcrap-steam-proton-wrapper
+    (obs-studio.override { cudaSupport = true; })
   ];
 
   home.file."antimicro.amgp".source = ./antimicro.amgp;
